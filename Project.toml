@@ -1,0 +1,13 @@
+name = "SystemLevelHamiltonian"
+uuid = "a0b4ee4f-8fee-4001-b7c2-b2f55611dd49"
+authors = ["Jeffrey Wack <jeffwack111@gmail.com> and contributors"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.6.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
