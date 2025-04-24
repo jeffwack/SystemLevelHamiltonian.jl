@@ -3,7 +3,21 @@ uuid = "a0b4ee4f-8fee-4001-b7c2-b2f55611dd49"
 authors = ["Jeffrey Wack <jeffwack111@gmail.com> and contributors"]
 version = "1.0.0-DEV"
 
+[deps]
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
+ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
+QuantumCumulants = "35bcea6d-e19f-57db-af74-8011de6c7255"
+QuantumOptics = "6e0679c1-51ea-5a7c-ac74-d61b76210b0c"
+SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+
 [compat]
+GLMakie = "0.11.5"
+ModelingToolkit = "9.74.0"
+QuantumCumulants = "0.3.7"
+QuantumOptics = "1.2.2"
+SymbolicUtils = "3.27.0"
+Symbolics = "6.38.0"
 julia = "1.6.7"
 
 [extras]
