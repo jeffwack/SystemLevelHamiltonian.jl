@@ -22,18 +22,40 @@ function onesparams(H)
     return Dict(rules)
 end
 
-function op_selector(op,idx)
+function op_creator(op,space,idx,Ncutoff)
     aon = op.aon
-    if idx == aon
-        if op isa Create
-            return create
-        elseif op isa Destroy
-            return destroy
+    if space isa FockSpace
+        if aon == idx
+            if op isa Create
+                return create(FockBasis(Ncutoff))
+            elseif op isa Destroy
+                return destroy(FockBasis(Ncutoff))
+            else
+                error("Unknown operator type $op")
+            end
         else
-            error("Unknown operator type")
+            return one(FockBasis(Ncutoff))
+        end
+    elseif space isa NLevelSpace && length(space.levels) == 2
+        if aon == idx
+            if op isa Transition
+                if op.j == space.GS && op.i != space.GS
+                    return sigmap(SpinBasis(1//2))
+                elseif op.i == space.GS && op.j != space.GS
+                    return sigmam(SpinBasis(1//2))
+                elseif op.i != space.GS && op.j != space.GS
+                    return sigmaz(SpinBasis(1//2))
+                else 
+                    error("Don't know how to classify this transition $op")
+                end
+            else
+                error("Unknown operator type $op")
+            end
+        else
+            return one(SpinBasis(1//2))
         end
     else
-        return one
+        error("Unknown Hilbert space $space")
     end
 end
 
@@ -45,28 +67,19 @@ function QOHamiltonian(H,paramrules,Ncutoff)
         error("Expression does not have homogenous Hilbert space")
     end
 
-    #now we want to contruct a dictionary mapping the 'atomic' hilbert spaces of QC to the 'atomic' hilbert spaces of QOHamiltonian
-    #first just get it working for only Fockstates
-    subspaces = []
-    for space in hilb.spaces
-        if space isa FockSpace{Symbol}
-            push!(subspaces,FockBasis(Ncutoff)) #TODO - how can we embed Ncutoff in the QC atomic hilbert space?
-        end
-    end
+    subspaces = hilb.spaces
 
-    #next, create a QO operator from each QC operator
     newops = []
     for oldop in oldops
-        newsubopfuncs = [op_selector(oldop,idx) for idx in eachindex(subspaces)]
-        newsubops = [f(space) for (f,space) in zip(newsubopfuncs,subspaces)]
+        newsubops = [op_creator(oldop,subspaces[idx],idx,Ncutoff) for idx in eachindex(subspaces)]
         newop = tensor(newsubops...)
         push!(newops,newop)
     end
 
     #now we need to substitute these operators into the symbolic expression of the Hamiltonian
     oprules = Dict([old => new for (old,new) in zip(oldops,newops)])
-    rules = merge(oprules,paramrules)
-    new_H = substitute(H,rules)
+    num_H = substitute(H,paramrules)
+    new_H = substitute(num_H,oprules)
 
     return new_H
 end
@@ -99,7 +112,6 @@ function get_numsymbols(expr)
         return (expr isa SymbolicUtils.Symbolic) ? Set([expr]) : Set() 
     end
 end
-
 
 function check_hilberts(expr)
     operators = get_qsymbols(expr)
