@@ -1,46 +1,42 @@
+function plotops!(ax, sol,ops)
 
-function plotlist(sol,idxs,names=idxs)
+    curves = [Point2f.(sol.t,real.(sol[op])) for op in ops]
 
-    curves = [[real(x[idx]) for x in sol.u] for idx in idxs]
+    series!(ax,curves,labels = string.(ops),color = :batlowS)
+    axislegend(ax)
+    return ax
+    
+end
 
+function plotops(sol,ops)
     fig = Figure()
     ax = Axis(fig[1,1])
-    for (name, curve) in zip(names,curves)
-        lines!(ax,sol.t,curve,label = name)
-    end 
-    axislegend(ax)
+    plotops!(ax, sol,ops)
     return fig
-    
 end
 
-function plotlist(sol,ops)
+function paramwidget(sys,ops)
+    fig = Figure()
+    plotax = Axis(fig[1,1])
 
-    strings = []
+    ps = parameters(sys)
 
-    #this loop is for removing parentheses which are only sometimes added around the operator names
-    #they have to be removed because they never appear in sys.unknowns
-    for op in ops
-        S = string(op)
-        if S[1] == '('
-            S = S[2:end-1]
+    sliders = [(label = string(symb), range = 0:0.1:10, startvalue = 1) for symb in ps]
+
+    sg = SliderGrid(fig[2,1],
+                    sliders...)
+    
+    u0 = zeros(ComplexF64,length(unknowns(sys)))
+
+    for changedslider in sg.sliders
+        on(changedslider.value) do update
+            empty!(plotax)
+            p0 = [sl.value[] for sl in sg.sliders]
+            prob = ODEProblem(sys,u0,(0.0,100),ps.=>p0)
+            sol = solve(prob,RK4())
+            plotops!(plotax,sol,ops)
         end
-        push!(strings,S)
-    end
+    end   
 
-    #adds the expected value brackets
-    namestoplot = ["⟨"*name*"⟩" for name in strings]
-    
-    #this creates a list of strings sharing the same position as the variables
-    unknown_names = [match(r"""(["])(.*?)\1""",string(n))[2] for n in sol.prob.f.sys.unknowns]
-
-    #gets the indices of the variables we want to plot by matching up the strings
-    idxs = [findfirst(x->x==name , unknown_names) for name in namestoplot]
-
-    return plotlist(sol,idxs,strings)
-end
-
-function plotall(sol)
-    idxs = eachindex(sol.prob.f.sys.unknowns)
-    names = [match(r"""(["])(.*?)\1""",string(n))[2] for n in sol.prob.f.sys.unknowns]
-    return plotlist(sol,idxs,names)
+    return fig
 end

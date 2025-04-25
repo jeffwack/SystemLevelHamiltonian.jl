@@ -1,15 +1,18 @@
 module SystemLevelHamiltonian
-#=
+
+
+
+using QuantumCumulants
+using Symbolics
+using ModelingToolkit
+using OrdinaryDiffEq
+
+using QuantumOptics
+
 using GLMakie
 include("QuantumMakie.jl")
 
-#TODO update these in light of the nice access to solution by sol[variable]
-export plotall, plotlist
-=#
-using QuantumCumulants
-using Symbolics
-
-using QuantumOptics
+export plotops!, plotops, paramwidget
 
 export SLH, get_qsymbols, promote, concatenation, feedbackreduce, QOHamiltonian, check_hilberts, get_numsymbols,onesparams
 
