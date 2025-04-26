@@ -1,20 +1,3 @@
-function plotops!(ax, sol,ops)
-
-    curves = [Point2f.(sol.t,real.(sol[op])) for op in ops]
-
-    series!(ax,curves,labels = string.(ops),color = :batlowS)
-    axislegend(ax)
-    return ax
-    
-end
-
-function plotops(sol,ops)
-    fig = Figure()
-    ax = Axis(fig[1,1])
-    plotops!(ax, sol,ops)
-    return fig
-end
-
 function paramwidget(sys,ops)
     fig = Figure()
     plotax = Axis(fig[1,1])

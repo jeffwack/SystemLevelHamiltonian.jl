@@ -11,9 +11,7 @@ h_fabry = FockSpace(:fabry)
 filter_cavity = SLH(["FC"],
                 [1],
                 [sqrt(κv)*av],
-                 Δv*adjoint(av)*av,
-                 h_fabry,
-                 [av])
+                 Δv*adjoint(av)*av)
 #########################################
 
 #########################################
@@ -26,9 +24,7 @@ h_squeeze = FockSpace(:squeezer)
 squeezer = SLH(["SQ"],
             [1],
             [sqrt(κq)*aq],
-            1im*ϵ*(adjoint(aq)^2- aq^2),
-            h_squeeze,
-            [aq])
+            1im*ϵ*(adjoint(aq)^2- aq^2))
 ###########################################
 
 ###########################################
@@ -42,9 +38,7 @@ b = Destroy(h_rpn,:b,2)
 rpn_cavity = SLH(   ["LIGHT"],
                     [1],
                     [sqrt(κr)*ar],
-                    Δc*ar'*ar+Δm*b'*b - g*ar'*ar*(b'+b),
-                    h_rpn,
-                    [ar,b])
+                    Δc*ar'*ar+Δm*b'*b - g*ar'*ar*(b'+b))
 #############################################
 
 A = concatenation(squeezer,filter_cavity)
