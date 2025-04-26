@@ -6,8 +6,10 @@ using GLMakie
 
 ##############################################################
 ### SYSTEM DEFINITION
-# Define parameters
-@cnumbers Δ g κ h ω
+
+# Define parameters and their numerical values
+ps = @cnumbers Δ g κ h 
+p0 = (0.1, 5, 0.3,0.1)
 
 # Define hilbert space
 hf = FockSpace(:cavity)
@@ -26,8 +28,9 @@ H = Δ*a'*a + g*(a'*sm + a*sp) + h*(a + a')
 # Coupling operators
 L = [κ*a]
 
-#ops we want to calculate expected values of
+#operators we want to calculate expected values of
 ops = [a,a'*a,sz]
+
 ###########################################################
 
 #####################################
@@ -36,25 +39,17 @@ ops = [a,a'*a,sz]
 eq_n = meanfield(ops,H,L;rates=ones(size(L)),order=3)
 eqs = complete(eq_n)
 
-#All the parameters we will pass to the ODE
-ps = (Δ, g, κ, h)
-
 @named sys = ODESystem(eqs)
 
 #NOTE - you must set the type of these numbers to be ComplexF64 to avoid error
 u0 = zeros(ComplexF64,length(eqs))#TODO: Are some initial conditions unphysical? For example not all combos of expected values of spin operators should be allowed?
 
-p0 = (0.1, 5, 0.3,0.1)
 prob = ODEProblem(sys,u0,(0.0,100),ps.=>p0)
 sol = solve(prob,RK4())
 #######################################################
 
 #########################################################
 #Simulate with QuantumOptics
-
-ps = (Δ, g, κ, h)
-p0 = (0.1, 5, 0.3,0.1)
-
 Ncutoff = 10
 
 QOH = convert_to_QO([H],Dict(ps.=>p0),Ncutoff)[1] #Making a list with one element and extracting the one element is because convert_to_QO() is expecting a list
@@ -68,13 +63,12 @@ N_steps = 1000
 T = range(0,100,N_steps)
 tout, ρt_master = timeevolution.master(T, ρ₀, QOH, QOL)
 
-#Now calculate the cumulants
+#Now calculate the expected values
 traj = []
 for op in QOops
     expectop(ρ) = expect(op,ρ)
     push!(traj,expectop.(ρt_master))
 end
-
 ##################################################################################
 
 #################################################################################
