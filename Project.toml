@@ -5,19 +5,23 @@ version = "1.0.0-DEV"
 
 [deps]
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
+Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 QuantumCumulants = "35bcea6d-e19f-57db-af74-8011de6c7255"
 QuantumOptics = "6e0679c1-51ea-5a7c-ac74-d61b76210b0c"
+StochasticDiffEq = "789caeaf-c7a9-5a7d-9973-96adeb23e2a0"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
 GLMakie = "0.11.5"
+Makie = "0.22.4"
 ModelingToolkit = "9.75.0"
 OrdinaryDiffEq = "6.95.1"
 QuantumCumulants = "0.3.7"
 QuantumOptics = "1.2.3"
+StochasticDiffEq = "6.76.0"
 SymbolicUtils = "3.27.0"
 Symbolics = "6.38.0"
 julia = "1.11.5"
