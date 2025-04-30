@@ -50,7 +50,7 @@ sol = solve(prob,RK4())
 #######################################################
 
 #########################################################
-#Simulate with QuantumOptics
+#Simulate with QuantumOptics #TODO: get rid of SystemLevelHamiltonian dep for conversion
 Ncutoff = 10
 
 QOH = convert_to_QO([H],Dict(ps.=>p0),Ncutoff)[1] #Making a list with one element and extracting the one element is because convert_to_QO() is expecting a list

@@ -83,7 +83,7 @@ function convert_to_QO(exprlist,paramrules,Ncutoff)
     return new_expr
 end
 
-#Wrote this with chatgpt
+#Wrote this with chatgpt #TODO: see if this can be replaced with QuantumCumulants' fundamental_operators()
 function get_qsymbols(expr)
     if Symbolics.istree(expr)
         return union(get_qsymbols.(Symbolics.arguments(expr))...)
