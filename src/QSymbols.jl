@@ -12,24 +12,24 @@ function op_creator(op,space,idx,Ncutoff)
     if space isa FockSpace
         if aon == idx
             if op isa Create
-                return create(FockBasis(Ncutoff))
+                return QuantumToolbox.create(Ncutoff)
             elseif op isa Destroy
-                return destroy(FockBasis(Ncutoff))
+                return QuantumToolbox.destroy(Ncutoff)
             else
                 error("Unknown operator type $op")
             end
         else
-            return one(FockBasis(Ncutoff))
+            return QuantumToolbox.qeye(Ncutoff)
         end
     elseif space isa NLevelSpace && length(space.levels) == 2
         if aon == idx
             if op isa Transition
                 if op.j == space.GS && op.i != space.GS
-                    return sigmap(SpinBasis(1//2))
+                    return QuantumToolbox.sigmap()
                 elseif op.i == space.GS && op.j != space.GS
-                    return sigmam(SpinBasis(1//2))
+                    return QuantumToolbox.sigmam()
                 elseif op.i != space.GS && op.j != space.GS
-                    return sigmaz(SpinBasis(1//2))
+                    return QuantumToolbox.sigmaz()
                 else 
                     error("Don't know how to classify this transition $op")
                 end
@@ -37,30 +37,30 @@ function op_creator(op,space,idx,Ncutoff)
                 error("Unknown operator type $op")
             end
         else
-            return one(SpinBasis(1//2))
+            return QuantumToolbox.qeye(2)
         end
     else
         error("Unknown Hilbert space $space")
     end
 end
 
-function standard_initial_state(QOBasis)
+function standard_initial_state(H)
     states = []
-    for basis in QOBasis.bases
-        if basis isa FockBasis
-            push!(states, fockstate(basis,0))
-        elseif basis isa SpinBasis && basis.spinnumber == 1//2
-            push!(states,spindown(basis))
+    for space in H.dimensions.to
+        if space.size == 2 
+            push!(states,spin_state(1//2,-1//2)) 
+        else
+            push!(states, fock(space.size,0))
         end
     end
-    return tensor(states...)
+    return QuantumToolbox.tensor(states...)
 end
 
 
-function convert_to_QO(exprlist,paramrules,Ncutoff)
-    oldops = collect(get_qsymbols(sum(exprlist)))
+function convert_to_QT(exprlist,paramrules,Ncutoff)
+    oldops = collect(get_qsymbols(sum(exprlist)))#TODO: replace get qsymbols with function from QuantumCumulants
 
-    if check_hilberts(sum(oldops))
+    if check_hilberts(sum(oldops)) #TODO: replace with compatible hilberts from QuantumCumulants
         hilb = first(oldops).hilbert
     else
         error("Expressions do not have homogenous Hilbert space")
@@ -71,7 +71,7 @@ function convert_to_QO(exprlist,paramrules,Ncutoff)
     newops = []
     for oldop in oldops
         newsubops = [op_creator(oldop,subspaces[idx],idx,Ncutoff) for idx in eachindex(subspaces)]
-        newop = tensor(newsubops...)
+        newop = QuantumToolbox.tensor(newsubops...)
         push!(newops,newop)
     end
 
