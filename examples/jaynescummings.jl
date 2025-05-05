@@ -74,6 +74,7 @@ end
 
 
 ##################################################################################
+#=
 #do Gram-Schmidt
 using LinearAlgebra
 
@@ -91,7 +92,7 @@ newopsdata = [reshape(v,22,22) for v in eachcol(Q)]
 newops = [Operator(basis(QOH),data) for data in newopsdata]
 #congrats, but you need to do the Gram-Schmidt in QC opjects to be very useful.
 #We could use the R matrix to tell us how to combine expected values!
-
+=#
 #################################################################################
 #Plotting
 fig = Figure()

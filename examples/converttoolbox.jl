@@ -68,7 +68,7 @@ sol_me = mesolve(QTH,Ψ₀,T, QTL) #Note that you pass a pure initial state, not
 #Now calculate the expected values
 traj = []
 for op in QTops
-    expectop(ρ) = expect(op,ρ)
+    expectop(ρ) = QuantumToolbox.expect(op,ρ)
     push!(traj,expectop.(ρt_master))
 end
 ##################################################################################
