@@ -1,3 +1,6 @@
+"""
+An SLH triple
+"""
 struct SLH
     inputs #must have unique elements
     outputs #must have unique elements
