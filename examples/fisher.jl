@@ -9,9 +9,9 @@ using GLMakie
 
 # Define parameters and their numerical values
 ps = @cnumbers Δ g κ h 
-dh = 0.001
-p1 = (0.1, 5, 0.3,0.1)
-p2 = (0.1, 5, 0.3,0.1+dh)
+dh = 0.000001
+p1 = (0.1, 5, 0.3,0.1-dh/2)
+p2 = (0.1, 5, 0.3,0.1+dh/2)
 
 # Define hilbert space
 hf = FockSpace(:cavity)
@@ -32,6 +32,7 @@ L = [κ*a]
 
 small_ops = [a,a'*a,sz]
 ###########################################################
+
 #######################################################
 #Simulate with QuantumToolbox #TODO: get rid of SystemLevelHamiltonian dep for conversion
 Ncutoff = 10
@@ -42,7 +43,7 @@ QTL1 = convert_to_QT(L,Dict(ps.=>p1),Ncutoff)
 QTH2 = convert_to_QT([H],Dict(ps.=>p2),Ncutoff)[1] #Making a list with one element and extracting the one element is because convert_to_QO() is expecting a list
 QTL2 = convert_to_QT(L,Dict(ps.=>p2),Ncutoff)
 
-Ψ₀ = standard_initial_state(QTH)
+Ψ₀ = standard_initial_state(QTH1)
 
 N_steps = 1000
 T = range(0,100,N_steps)
@@ -52,44 +53,39 @@ sol_me2 = mesolve(QTH2,Ψ₀,T, QTL2) #Note that you pass a pure initial state, 
 ρt_master1 = sol_me1.states
 ρt_master2 = sol_me2.states
 ##################################################################################
-T_f = 600
+T_f = 100
 
 rho1 = ρt_master1[T_f]
 rho2 = ρt_master2[T_f]
 
-rho_dot = (rho2 - rho1)/dh
+rho_dot = (rho1 - rho2)/dh
 
 rho = (rho1+rho2)/2
 
-
-using LinearAlgebra
-
-#Function from James, translated to Julia by chatGPT
-function compute_qfi(qρ, qρ_dot)
-    ρ = qρ.data
-    ρ_dot = qρ_dot.data
-    evals, evecs = eigen(Hermitian(ρ))  # eigendecomposition
-
-    FQ_element = zeros(eltype(ρ), size(ρ))
-
-    for j in eachindex(evals)
-        λ_j = evals[j]
-        ψ_j = evecs[:, j]
-        for k in eachindex(evals)
-            λ_k = evals[k]
-            ψ_k = evecs[:, k]
-
-            numerator = 4 * λ_j * abs(dot(ψ_k', ρ_dot * ψ_j))^2
-            denominator = (λ_k + λ_j)^2
-            FQ_element[j, k] = numerator / denominator
-        end
-    end
-
-    FQ = sum(skipmissing(FQ_element))  # equivalent to np.nansum
-    return real(FQ)
+function data(rho)
+    return 1/2*(rho.data + adjoint(rho.data))    
 end
 
-qfi = compute_qfi(rho,rho_dot)
+ρ = data(rho)
+ρ_dot = data(rho_dot)
+
+
+for n in 1:15
+    tol = 1*10.0^(-n)
+
+    L = sld_operator(ρ,ρ_dot,eps = tol)
+
+    qfiviaL = tr(ρ*L*L)
+
+    qfi2 = compute_qfi(ρ,ρ_dot,eps = tol)
+
+    qfi3 = compute_qfi_alt(ρ,ρ_dot,eps = tol)
+
+    println("tol = $tol")
+    println(qfiviaL)
+    println(qfi2)
+    println(qfi3)
+end
 
 #TODO: plot qfi as a function of time. What is the scaling with T?
 #TODO: isolate qfi of subsystems with reduced density matrix. Verify 'reverse triangle inequality' of subsystem QFI

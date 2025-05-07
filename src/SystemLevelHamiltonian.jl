@@ -6,6 +6,7 @@ using ModelingToolkit
 using OrdinaryDiffEq
 
 using QuantumOptics
+using LinearAlgebra
 
 using QuantumToolbox
 
@@ -24,5 +25,9 @@ export SLH, concatenation, feedbackreduce
 
 include("linearquantumsystems.jl")
 export ABCDquadrature, ABCDcomplex
+
+
+include("fisherinfo.jl")
+export sld_operator, compute_qfi, compute_qfi_alt
 
 end
