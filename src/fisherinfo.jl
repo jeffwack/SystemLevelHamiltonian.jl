@@ -8,12 +8,12 @@ eigenbasis method. Returns `L` in the original basis.
 # Arguments
 - `rho`: Hermitian density matrix (N×N)
 - `drho`: Derivative of the density matrix with respect to some parameter
-- `tol`: Threshold for eigenvalues considered nonzero (default: 1e-12)
+- `tol`: Threshold for eigenvalues considered nonzero (default: 1e-5)
 
 # Returns
 - `L`: Symmetric logarithmic derivative (N×N Hermitian matrix)
 """
-function sld_operator(rho, drho; eps=1e-3)
+function sld_operator(rho, drho; eps=1e-5)
     @assert size(rho) == size(drho) "rho and drho must be the same size"
     @assert issymmetric(rho) || ishermitian(rho) "rho must be Hermitian"
     @assert ishermitian(drho) "drho must be Hermitian"
@@ -40,7 +40,7 @@ function sld_operator(rho, drho; eps=1e-3)
 end
 
 
-function compute_qfi(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-3)
+function compute_qfi(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-5)
     # Check Hermiticity
     @assert ishermitian(ρ) "ρ is not Hermitian"
     @assert ishermitian(ρ_dot) "ρ_dot is not Hermitian"
@@ -65,7 +65,7 @@ function compute_qfi(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-3)
     return FQ 
 end
 
-function compute_qfi_alt(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-3)
+function compute_qfi_alt(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-5)
     # Check Hermiticity
     @assert ishermitian(ρ) "ρ is not Hermitian"
     @assert ishermitian(ρ_dot) "ρ_dot is not Hermitian"

@@ -90,7 +90,7 @@ end
 #TODO: plot qfi as a function of time. What is the scaling with T?
 #TODO: isolate qfi of subsystems with reduced density matrix. Verify 'reverse triangle inequality' of subsystem QFI
 #TODO: using the SLD, perform the optimal measurement and calculate the classical Figure
-#TODO: compare 1) 'direct' QFI 2) QFI from SLD 3) CFI of optimal measurment. If all 3 agree we feel good.
+
 #TODO: if the states are pure and evolution is unitary, QFI is the variance of the generator of the unitary.
 #TODO: Calculate time series for linear systems. Here the 'local time' measurements should not lose on any info. 
 #Compare to the analytic Laplace transform. 
