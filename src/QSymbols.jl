@@ -83,14 +83,16 @@ function convert_to_QT(exprlist,paramrules,Ncutoff)
     return new_expr
 end
 
-#Wrote this with chatgpt #TODO: see if this can be replaced with QuantumCumulants' fundamental_operators()
+#Wrote this with chatgpt 
+#TODO: see if this can be replaced with QuantumCumulants' fundamental_operators()
+#does not seem to be the case, fundamental_operators() works on a hilbert space
 function get_qsymbols(expr)
     if Symbolics.istree(expr)
         return union(get_qsymbols.(Symbolics.arguments(expr))...)
     else
         return (expr isa Number) || (expr isa SymbolicUtils.Symbolic) ? Set() : Set([expr])
     end
-end
+end 
 
 function get_numsymbols(expr)
     if Symbolics.istree(expr)

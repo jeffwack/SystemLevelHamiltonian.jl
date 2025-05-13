@@ -1,4 +1,4 @@
-function paramwidget(sys,ops)
+function paramwidget(sys,ops, T)
     fig = Figure()
     plotax = Axis(fig[1,1])
 
@@ -15,11 +15,20 @@ function paramwidget(sys,ops)
         on(changedslider.value) do update
             empty!(plotax)
             p0 = [sl.value[] for sl in sg.sliders]
-            prob = ODEProblem(sys,u0,(0.0,100),ps.=>p0)
+            prob = ODEProblem(sys,u0,(0.0,T),ps.=>p0)
             sol = solve(prob,RK4())
-            plotops!(plotax,sol,ops)
+            curves = [Point2f.(sol.t,real.(sol[op])) for op in ops]
+            series!(plotax,curves,labels = string.(ops),color = :tab10)
         end
     end   
 
+    empty!(plotax)
+    p0 = [sl.value[] for sl in sg.sliders]
+    prob = ODEProblem(sys,u0,(0.0,T),ps.=>p0)
+    sol = solve(prob,RK4())
+    curves = [Point2f.(sol.t,real.(sol[op])) for op in ops]
+    series!(plotax,curves,labels = string.(ops),color = :tab10)
+    axislegend(plotax)
+    
     return fig
 end

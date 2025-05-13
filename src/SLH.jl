@@ -12,7 +12,7 @@ end
 SLH(inout, S, L, H) = SLH(inout, inout, S,L,H)
 
 function hilbert(sys::SLH)
-    ops = operators(sys)
+    ops = operators(sys) 
     if check_hilberts(sum(ops)) #Have to sum because check_hilberts() is expecting an expression
         return first(ops).hilbert
     else
@@ -69,7 +69,7 @@ function concatenation(A,B)
 
     if !isnothing(hilbert(A)) 
         if !isnothing(hilbert(B))
-            hilb_product = tensor(hilbert(A),hilbert(B))
+            hilb_product = QuantumCumulants.tensor(hilbert(A),hilbert(B))
 
             new_Aops = [promote(op,hilb_product) for op in operators(A)]
             new_Bops = [promote(op,hilb_product) for op in operators(B)]
