@@ -26,4 +26,8 @@ export SLH, concatenation, feedbackreduce, hilbert, operators
 include("fisherinfo.jl")
 export sld_operator, compute_qfi, compute_qfi_alt
 
+import Base.getindex
+include("linearsystems.jl")
+export StateSpace, RationalMatrix, tfs
+
 end

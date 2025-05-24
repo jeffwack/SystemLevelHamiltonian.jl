@@ -1,8 +1,9 @@
 using Symbolics
 using LinearAlgebra
+using SystemLevelHamiltonian
 using GLMakie
 
-@variables γ Δ g ω
+@variables γ Δ g ω 
 
 A = [-γ  0  Δ  0; #q_a
       0  0  0  ω; #q_b
@@ -21,8 +22,12 @@ C = [sqrt(2*γ) 0 0         0;
 D = [1 0 0; #q_out
      0 1 0] #p_out
 
+sys = StateSpace([:qa,:qb,:pa,:pb],[:qo,:po],A,B,C,D)
+
 @variables s
 
+M = tfs(sys,s)
+#=
 G =  inv(s*I - A)
 T = C*G*B + D
 
@@ -48,3 +53,4 @@ lines!(ax,freq, Qtf)
 lines!(ax, freq, Ptf)
 
 fig
+=#
