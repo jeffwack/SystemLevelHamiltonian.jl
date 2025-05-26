@@ -1,3 +1,9 @@
 using Documenter, SystemLevelHamiltonian
 
-makedocs(sitename="My Documentation",remotes = nothing)
+push!(LOAD_PATH,"../src/")
+
+makedocs()
+
+deploydocs(
+    repo = "github.com/jeffwack/SystemLevelHamiltonian.jl.git",
+)

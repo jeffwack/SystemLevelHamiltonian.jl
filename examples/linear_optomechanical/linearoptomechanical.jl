@@ -27,10 +27,9 @@ sys = StateSpace([:qa,:qb,:pa,:pb],[:qo,:po],A,B,C,D)
 @variables s
 
 M = tfs(sys,s)
-#=
-G =  inv(s*I - A)
-T = C*G*B + D
 
+
+#=
 #now we want to extract the transfer function from the GW input to the two outputs
 Q = Symbolics.build_function(T[1,3],s, γ, Δ, g, ω,expression = Val{false})
 P = Symbolics.build_function(T[2,3],s, γ, Δ, g, ω,expression = Val{false})

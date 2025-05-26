@@ -1,5 +1,7 @@
 """
-An SLH triple
+SLH(inputs, outputs, S, L, H)
+
+An SLH triple describes an open quantum system. See Combes, arXiv.1611.00375
 """
 struct SLH
     inputs #must have unique elements
@@ -52,7 +54,11 @@ function promote(operator,product_space)
 end
 
 
-#Here we write functions to implement the composition rules for SLH systems described in Combes (2017)
+"""
+concatenation(A::SLH,B::SLH)
+
+creates a composite system of A and B with no interconnections. Combes eq. 59
+"""
 function concatenation(A,B)
     #To create a combined system, we 'stack' the inputs and outputs of A on top of those of B
     inputs = cat(A.inputs,B.inputs,dims = 1)
@@ -114,7 +120,11 @@ function concatenation(A,B)
     return SLH(inputs, outputs,S,L,H)
 end
 
-#x is the output port, y is the input port
+"""
+feedbackreduce(A::SLH,output,input)
+
+Connects the output port to the input port, reducing the number of outputs and inputs by one each. Combes eq 61.
+"""
 function feedbackreduce(A,output, input)
 
     x = findfirst(isequal(output),A.outputs)
