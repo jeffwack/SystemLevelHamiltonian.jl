@@ -2,17 +2,17 @@
 A package for the design and analysis of open quantum systems.
 
 ```@docs
-SLH()
+SLH
 ```
 
 ```@docs
-concatenation()
+concatenation
 ```
 
 ```@docs
-feedbackreduce()
+feedbackreduce
 ```
 
 ```@docs
-sld_operator()
+sld_operator
 ```
