@@ -7,7 +7,7 @@ on:
     tags: '*'
   pull_request:
 
-jobs:
+jobs: 
   build:
     # These permissions are needed to:
     # - Deploy the documentation: https://documenter.juliadocs.org/stable/man/hosting/#Permissions
@@ -24,7 +24,9 @@ jobs:
         with:
           version: '1'
       - uses: julia-actions/cache@v2
-      - name: Install dependencies
+      - name: Install Linux dependencies
+        run: sudo apt-get update && sudo apt-get install -y xorg-dev mesa-utils xvfb libgl1 freeglut3-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+      - name: Install Julia dependencies
         shell: julia --color=yes --project=docs {0}
         run: |
           using Pkg
