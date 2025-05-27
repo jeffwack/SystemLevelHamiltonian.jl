@@ -91,7 +91,7 @@ function compute_qfi_alt(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-5)
     return FQ 
 end
 
-function compute_qfi_fdm(H, L, ps, Ncutoff, Ψ₀, T, T_f, p, param_index, dh; eps=1e-12)
+function compute_qfi_fdm(H, L, ps, Ncutoff, Ψ₀, T, T_f, p, param_index, dh; eps=1e-6)
     p1 = Base.setindex(p, p[param_index] - dh/2, param_index)
     p2 = Base.setindex(p, p[param_index] + dh/2, param_index)
 
@@ -108,5 +108,14 @@ function simulate_density_matrix(H, L, ps, Ncutoff, Ψ₀, T, T_f, p)
     QTH = convert_to_QT([H], Dict(ps .=> p), Ncutoff)[1]
     QTL = convert_to_QT(L, Dict(ps .=> p), Ncutoff)
     sol = mesolve(QTH, Ψ₀, T, QTL)
-    return data(sol.states[T_f])
+    return hermitian_data(sol.states[T_f])
+end
+
+"""
+hermitian_data(rho)
+
+Where rho is a density matrix which can be accessed as rho.data. This function returns the average of rho and the adjoint of rho to guarantee Hermitian output.
+"""
+function hermitian_data(rho)
+    return 1/2*(rho.data + adjoint(rho.data))    
 end

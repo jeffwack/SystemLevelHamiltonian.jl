@@ -4,14 +4,13 @@ SLH(inputs, outputs, S, L, H)
 An SLH triple describes an open quantum system. See Combes, arXiv.1611.00375
 """
 struct SLH
+    name #should be a symbol
     inputs #must have unique elements
     outputs #must have unique elements
     S #size nxn
     L #size n
     H #has operators which act on hilbert
 end
-
-SLH(inout, S, L, H) = SLH(inout, inout, S,L,H)
 
 function hilbert(sys::SLH)
     ops = operators(sys) 
@@ -55,16 +54,26 @@ end
 
 
 """
-concatenation(A::SLH,B::SLH)
+concatenation(name, syslist::Vector{SLH})
 
-creates a composite system of A and B with no interconnections. Combes eq. 59
+creates a composite system with no interconnections. Combes eq. 59
 """
-function concatenation(A,B)
+function concatenation(name,syslist)
     #To create a combined system, we 'stack' the inputs and outputs of A on top of those of B
-    inputs = cat(A.inputs,B.inputs,dims = 1)
-    outputs = cat(A.outputs,B.outputs,dims = 1)
 
-    # since the matrices may be of any type, we cannot use the built-in function cat(A[1], B[1]; dims=(1,2)) since it tries to create a matrix of zeros from type Any 
+    #first, we promote the names of inputs and outputs, to prevent naming collisions
+    newinputs = [[Symbol(input,:_,sys.name) for input in sys.inputs] for sys in syslist]
+    inputs = cat(newinputs...,dims = 1)
+
+    newoutputs = [[Symbol(output,:_,sys.name) for output in sys.outputs] for sys in syslist]
+    outputs = cat(newoutputs...,dims = 1)
+
+    #next, we concate all the scattering matrices block diagonally
+    Slist = [sys.S for sys in syslist]
+    S = cat(Slist...;dims=(1,2))
+
+    #= #this used to be here, and I have a feeling will be useful to look at when that call to cat throws an error eventually
+    #since the matrices may be of any type, we cannot use the built-in function cat(A[1], B[1]; dims=(1,2)) since it tries to create a matrix of zeros from type Any 
     Z12 = zeros(size(A.S)[1],size(B.S)[1])
     Z21 = zeros(size(B.S)[1],size(A.S)[1])
 
@@ -72,52 +81,23 @@ function concatenation(A,B)
     S2 = cat(Z21, B.S; dims=2)
 
     S = cat(S1,S2;dims=1)
+    =#
+    hilb_product = QuantumCumulants.tensor([hilbert(sys) for sys in syslist]...)
 
-    if !isnothing(hilbert(A)) 
-        if !isnothing(hilbert(B))
-            hilb_product = QuantumCumulants.tensor(hilbert(A),hilbert(B))
+    oldops = [collect(operators(sys)) for sys in syslist]
+    newops = [[promote(op,hilb_product) for op in oplist] for oplist in oldops]
+    
 
-            new_Aops = [promote(op,hilb_product) for op in operators(A)]
-            new_Bops = [promote(op,hilb_product) for op in operators(B)]
+    rules = merge([Dict([old => new for (old,new) in zip(oldoplist,newoplist)]) for (oldoplist,newoplist) in zip(oldops,newops)]...)
+    newHs = [substitute(sys.H,rules) for sys in syslist]
 
-            Arule = Dict([old => new for (old,new) in zip(operators(A),new_Aops)])
-            Adagrule = Dict([adjoint(old) => adjoint(new) for (old,new) in zip(operators(A),new_Aops)])
-            Arules = merge(Arule,Adagrule)
-            new_HA = substitute(A.H,Arules)
+    H = sum(newHs)
 
-            Brule = Dict([old => new for (old,new) in zip(operators(B),new_Bops)])
-            Bdagrule = Dict([adjoint(old) => adjoint(new) for (old,new) in zip(operators(B),new_Bops)])
-            Brules = merge(Brule,Bdagrule)
-            new_HB = substitute(B.H,Brules)
+    newLs = [[substitute(collapse,rules) for collapse in sys.L] for sys in syslist]
 
-            ops = cat(new_Aops,new_Bops;dims=1)
-            H = new_HB + new_HA
+    L = cat(newLs, dims=1)
 
-            new_LA = [substitute(collapse,Arules) for collapse in A.L]
-            new_LB = [substitute(collapse,Brules) for collapse in B.L]
-
-            L = cat(new_LA, new_LB, dims=1)
-        else
-            L = cat(A.L,B.L,dims = 1)
-            H = A.H
-            hilb_product = hilbert(A)
-            ops = operators(A)
-        end
-    else
-        if !isnothing(hilbert(B))
-            L = cat(A.L,B.L,dims = 1)
-            H = B.H
-            hilb_product = hilbert(B)
-            ops = operators(B)
-        else 
-            L = cat(A.L,B.L,dims = 1) 
-            H = 0
-            hilb_product = nothing
-            ops = nothing
-        end
-    end
-
-    return SLH(inputs, outputs,S,L,H)
+    return SLH(name,inputs, outputs,S,L,H)
 end
 
 """
@@ -159,7 +139,17 @@ function feedbackreduce(A,output, input)
 
     H = A.H + Hprime
 
-    return SLH(newinputs,newoutputs,S,L,H)
+    return SLH(A.name,newinputs,newoutputs,S,L,H)
 end
 
+function convert_to_QT(sys::SLH,paramrules,Ncuttof)
+    QTH = convert_to_QT([sys.H], Dict(ps .=> p), Ncutoff)[1]
+    QTL = convert_to_QT(sys.L, Dict(ps .=> p), Ncutoff)
+    #QTS = TODO
+    return SLH(sys.inputs, sys.outputs, S, QTL,QTH)
+end
 
+#TODO in what cases could S and L have independent ops?
+function get_qsymbols(sys::SLH)
+    return get_qsymbols(sys.H)
+end

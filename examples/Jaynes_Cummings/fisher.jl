@@ -2,7 +2,6 @@ using QuantumCumulants
 using SystemLevelHamiltonian
 using QuantumToolbox
 using ModelingToolkit, OrdinaryDiffEq
-using GLMakie
 
 ##############################################################
 ### SYSTEM DEFINITION
@@ -31,15 +30,15 @@ small_ops = [a,a'*a,sz]
 ###########################################################
 Ncutoff = 10
 N_steps = 1000
+T = range(0,100,N_steps)
 
 p = (0.1, 5, 0.3,0.1)
-
-
-
-
+dh = 1e-6
 #######################################################
 #Simulate with QuantumToolbox #TODO: get rid of SystemLevelHamiltonian dep for conversion
 
+p1 = (0.1, 5, 0.3, 0.1+dh/2)
+p2 = (0.1, 5, 0.3, 0.1-dh/2)
 
 QTH1 = convert_to_QT([H],Dict(ps.=>p1),Ncutoff)[1] #Making a list with one element and extracting the one element is because convert_to_QO() is expecting a list
 QTL1 = convert_to_QT(L,Dict(ps.=>p1),Ncutoff)
@@ -64,30 +63,25 @@ rho_dot = (rho1 - rho2)/dh
 
 rho = (rho1+rho2)/2
 
-function data(rho)
-    return 1/2*(rho.data + adjoint(rho.data))    
-end
-
 ρ = data(rho)
 ρ_dot = data(rho_dot)
 
+tol = 1e-4
 
-for n in 1:15
-    tol = 1*10.0^(-n)
+qfi_val = compute_qfi_fdm(H, L, ps, Ncutoff, Ψ₀, T, 100, p, 4, dh,eps = tol)
 
-    L = sld_operator(ρ,ρ_dot,eps = tol)
+L = sld_operator(ρ,ρ_dot,eps = tol)
 
-    qfiviaL = tr(ρ*L*L)
+qfiviaL = tr(ρ*L*L)
 
-    qfi2 = compute_qfi(ρ,ρ_dot,eps = tol)
+qfi2 = compute_qfi(ρ,ρ_dot,eps = tol)
 
-    qfi3 = compute_qfi_alt(ρ,ρ_dot,eps = tol)
+qfi3 = compute_qfi_alt(ρ,ρ_dot,eps = tol)
 
-    println("tol = $tol")
-    println(qfiviaL)
-    println(qfi2)
-    println(qfi3)
-end
+println(qfi_val)
+println(qfiviaL)
+println(qfi2)
+println(qfi3)
 
 #TODO: plot qfi as a function of time. What is the scaling with T?
 #TODO: isolate qfi of subsystems with reduced density matrix. Verify 'reverse triangle inequality' of subsystem QFI
@@ -97,4 +91,3 @@ end
 #TODO: Calculate time series for linear systems. Here the 'local time' measurements should not lose on any info. 
 #Compare to the analytic Laplace transform. 
 
-qfi_val = compute_qfi_fdm(H, L, ps, Ncutoff, Ψ₀, range(0,100,N_steps), 100, p, 4, 1e-6)
