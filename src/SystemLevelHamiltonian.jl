@@ -4,6 +4,7 @@ using QuantumCumulants
 using Symbolics
 using ModelingToolkit
 using OrdinaryDiffEq
+using FiniteDiff
 
 using QuantumOptics
 using LinearAlgebra

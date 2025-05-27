@@ -5,8 +5,8 @@ version = "1.0.0-DEV"
 
 [deps]
 ControlSystems = "a6e380b2-a6ca-5380-bf3e-84a91bcd477e"
+FiniteDiff = "6a86dc24-6348-571c-b903-95158fe2bd41"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
-
 Integrals = "de52edbc-65ea-441a-8357-d3a637375a31"
 JumpProcesses = "ccbc3e58-028d-4f4c-8cd5-9ae44345cda5"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -27,6 +27,7 @@ GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 
 [compat]
 ControlSystems = "1.13.0"
+FiniteDiff = "2.27.0"
 ForwardDiff = "0.10.38"
 GLMakie = "0.11.8"
 Integrals = "4.5.0"

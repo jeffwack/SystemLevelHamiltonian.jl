@@ -57,7 +57,7 @@ function standard_initial_state(H)
 end
 
 
-function convert_to_QT(exprlist,paramrules,Ncutoff)
+function convert_to_QT(exprlist,Ncutoff,paramrules)
     oldops = collect(get_qsymbols(sum(exprlist)))#TODO: replace get qsymbols with function from QuantumCumulants
 
     if check_hilberts(sum(oldops)) #TODO: replace with compatible hilberts from QuantumCumulants
@@ -66,17 +66,35 @@ function convert_to_QT(exprlist,paramrules,Ncutoff)
         error("Expressions do not have homogenous Hilbert space")
     end
 
-    subspaces = hilb.spaces
-
     newops = []
-    for oldop in oldops
-        newsubops = [op_creator(oldop,subspaces[idx],idx,Ncutoff) for idx in eachindex(subspaces)]
-        newop = QuantumToolbox.tensor(newsubops...)
-        push!(newops,newop)
+
+    if hasfield(typeof(hilb),:spaces)
+        subspaces = hilb.spaces
+
+        
+        for oldop in oldops
+            newsubops = [op_creator(oldop,subspaces[idx],idx,Ncutoff) for idx in eachindex(subspaces)]
+            newop = QuantumToolbox.tensor(newsubops...)
+            push!(newops,newop)
+        end
+    else
+        for oldop in oldops
+            newop = op_creator(oldop,hilb,1,Ncutoff) 
+            push!(newops,newop)
+        end
     end
 
     #now we need to substitute these operators into the symbolic expression of the Hamiltonian
     oprules = Dict([old => new for (old,new) in zip(oldops,newops)])
+    #=
+    println("Oprules")
+    println(oprules)
+    println("exprlist")
+    println(exprlist)
+    println("paramrules")
+    println(paramrules)
+    println("done")
+    =#
     num_expr = [substitute(X,paramrules) for X in exprlist]
     new_expr = [substitute(X,oprules) for X in num_expr]
 

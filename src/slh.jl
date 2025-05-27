@@ -141,15 +141,25 @@ function feedbackreduce(A,output, input)
 
     return SLH(A.name,newinputs,newoutputs,S,L,H)
 end
+"""
+convert_to_QT(sys::SLH,paramrules,Ncuttof)
 
-function convert_to_QT(sys::SLH,paramrules,Ncuttof)
-    QTH = convert_to_QT([sys.H], Dict(ps .=> p), Ncutoff)[1]
-    QTL = convert_to_QT(sys.L, Dict(ps .=> p), Ncutoff)
+return (standard_initial_state(QTH), SLH(sys.inputs, sys.outputs, S, QTL,QTH)) 
+"""
+function convert_to_QT(sys::SLH,Ncutoff,paramrules)
+    QTL = convert_to_QT([sys.L...,sys.H], Ncutoff,paramrules)
     #QTS = TODO
-    return SLH(sys.inputs, sys.outputs, S, QTL,QTH)
+    QTH = pop!(QTL)
+    name = Symbol(sys.name,:_,:numeric)
+
+    return (SLH(name,sys.inputs, sys.outputs, sys.S, QTL,QTH),standard_initial_state(QTH))
 end
 
 #TODO in what cases could S and L have independent ops?
 function get_qsymbols(sys::SLH)
     return get_qsymbols(sys.H)
+end
+
+function get_numsymbols(sys::SLH)
+    return union(get_numsymbols(sys.H),get_numsymbols(sys.L...))
 end

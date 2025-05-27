@@ -5,7 +5,7 @@ Compute the symmetric logarithmic derivative (SLD) `L` for a given
 density matrix `rho` and its parameter derivative `drho`, using the
 eigenbasis method. Returns `L` in the original basis.
 
-# Arguments
+# Arguments 
 - `rho`: Hermitian density matrix (N×N)
 - `drho`: Derivative of the density matrix with respect to some parameter
 - `tol`: Threshold for eigenvalues considered nonzero (default: 1e-5)
@@ -91,24 +91,31 @@ function compute_qfi_alt(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-5)
     return FQ 
 end
 
-function compute_qfi_fdm(H, L, ps, Ncutoff, Ψ₀, T, T_f, p, param_index, dh; eps=1e-6)
-    p1 = Base.setindex(p, p[param_index] - dh/2, param_index)
-    p2 = Base.setindex(p, p[param_index] + dh/2, param_index)
+function compute_qfi_fdm(sys, Ncutoff, T,params, param) 
+    symb = collect(keys(params))
+    p0 = [params[sy] for sy in symb]
+    idx = findfirst(isequal(param),symb)
 
-    ρ1 = simulate_density_matrix(H, L, ps, Ncutoff, Ψ₀, T, T_f, p1)
-    ρ2 = simulate_density_matrix(H, L, ps, Ncutoff, Ψ₀, T, T_f, p2)
-    ρ_dot = (ρ2 - ρ1) / dh
-    ρ = (ρ1 + ρ2) / 2
+    function closure(para)
+        p = copy(p0)
+        p[idx] = para
+        return simulate_density_matrix(sys, Ncutoff, T,symb, p)  # flatten to 1D vector of real numbers for FiniteDiff
+    end
+    ρ = closure(p0[idx])
+    ρ_dot = FiniteDiff.finite_difference_derivative(closure,p0[idx])
 
-    L_op = sld_operator(ρ, ρ_dot, eps=eps)
+    L_op = sld_operator(ρ, ρ_dot, eps=1e-4)
     return tr(ρ * L_op * L_op)
 end
 
-function simulate_density_matrix(H, L, ps, Ncutoff, Ψ₀, T, T_f, p)
-    QTH = convert_to_QT([H], Dict(ps .=> p), Ncutoff)[1]
-    QTL = convert_to_QT(L, Dict(ps .=> p), Ncutoff)
-    sol = mesolve(QTH, Ψ₀, T, QTL)
-    return hermitian_data(sol.states[T_f])
+
+function simulate_density_matrix(sys,Ncutoff,T,params,p)
+    paramrules = Dict([ps => pn for (ps,pn) in zip(params,p) ])
+    (numsys,Ψ0) = convert_to_QT(sys,Ncutoff,paramrules)
+    println(numsys)
+    println(Ψ0)
+    sol = mesolve(numsys.H, Ψ0, T, numsys.L)
+    return hermitian_data(sol.states[end])
 end
 
 """
