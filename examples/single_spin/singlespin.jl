@@ -19,7 +19,7 @@ hilb = NLevelSpace(:spin, (:e, :g))
 H = h * σx
 
 # No dissipation
-L = [0.001*σx]
+L = [0.0000001*σx]
 
 sys = SLH(:spin,nothing,nothing,[1],L,H)
 
@@ -33,7 +33,7 @@ paramrules = Dict([h=>0.01])
 
 qfiviaL = compute_qfi_fdm(sys, Ncutoff,T, paramrules, h)
 
-t_end = range(1,100,100)
+t_end = range(3,100,100)
 
 qfi = []
 for t in t_end
@@ -41,4 +41,4 @@ for t in t_end
     push!(qfi,compute_qfi_fdm(sys, Ncutoff,T, paramrules, h))
 end
 
-plot(t_end,qfi)
+plot(t_end,real.(qfi))

@@ -112,8 +112,10 @@ end
 function simulate_density_matrix(sys,Ncutoff,T,params,p)
     paramrules = Dict([ps => pn for (ps,pn) in zip(params,p) ])
     (numsys,Ψ0) = convert_to_QT(sys,Ncutoff,paramrules)
+    #=
     println(numsys)
     println(Ψ0)
+    =#
     sol = mesolve(numsys.H, Ψ0, T, numsys.L)
     return hermitian_data(sol.states[end])
 end
