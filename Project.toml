@@ -6,11 +6,9 @@ version = "1.0.0-DEV"
 [deps]
 ControlSystems = "a6e380b2-a6ca-5380-bf3e-84a91bcd477e"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
-GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 Integrals = "de52edbc-65ea-441a-8357-d3a637375a31"
 JumpProcesses = "ccbc3e58-028d-4f4c-8cd5-9ae44345cda5"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 MatrixEquations = "99c1a7ee-ab34-5fd5-8076-27c950a045f4"
 MatrixPencils = "48965c70-4690-11ea-1f13-43a2532b2fa8"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
@@ -23,6 +21,12 @@ StochasticDiffEq = "789caeaf-c7a9-5a7d-9973-96adeb23e2a0"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
+[weakdeps]
+
+
+[extensions]
+MakieExt = "GLMakie"
+
 [compat]
 ControlSystems = "1.13.0"
 ForwardDiff = "0.10.38"
@@ -30,7 +34,6 @@ GLMakie = "0.11.8"
 Integrals = "4.5.0"
 JumpProcesses = "9.14.3"
 LinearAlgebra = "1.11.0"
-Makie = "0.22.7"
 MatrixEquations = "2.4.5"
 MatrixPencils = "1.8.2"
 ModelingToolkit = "9.75.0"

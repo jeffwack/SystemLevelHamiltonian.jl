@@ -10,10 +10,6 @@ using LinearAlgebra
 
 using QuantumToolbox
 
-using GLMakie
-include("makieplotting.jl")
-export plotops!, plotops, paramwidget
-
 include("qsymbols.jl")
 export get_qsymbols, promote, QOHamiltonian, check_hilberts, get_numsymbols, convert_to_QT, standard_initial_state
 
@@ -24,7 +20,7 @@ export SLH, concatenation, feedbackreduce, hilbert, operators
 #export FreqDepSqueeze, JanesCummings
 
 include("fisherinfo.jl")
-export sld_operator, compute_qfi, compute_qfi_alt
+export sld_operator, compute_qfi, compute_qfi_alt, simulate_density_matrix, compute_qfi_fdm
 
 import Base.getindex
 include("linearsystems.jl")

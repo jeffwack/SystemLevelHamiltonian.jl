@@ -90,3 +90,23 @@ function compute_qfi_alt(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-5)
 
     return FQ 
 end
+
+function compute_qfi_fdm(H, L, ps, Ncutoff, Ψ₀, T, T_f, p, param_index, dh; eps=1e-12)
+    p1 = Base.setindex(p, p[param_index] - dh/2, param_index)
+    p2 = Base.setindex(p, p[param_index] + dh/2, param_index)
+
+    ρ1 = simulate_density_matrix(H, L, ps, Ncutoff, Ψ₀, T, T_f, p1)
+    ρ2 = simulate_density_matrix(H, L, ps, Ncutoff, Ψ₀, T, T_f, p2)
+    ρ_dot = (ρ2 - ρ1) / dh
+    ρ = (ρ1 + ρ2) / 2
+
+    L_op = sld_operator(ρ, ρ_dot, eps=eps)
+    return tr(ρ * L_op * L_op)
+end
+
+function simulate_density_matrix(H, L, ps, Ncutoff, Ψ₀, T, T_f, p)
+    QTH = convert_to_QT([H], Dict(ps .=> p), Ncutoff)[1]
+    QTL = convert_to_QT(L, Dict(ps .=> p), Ncutoff)
+    sol = mesolve(QTH, Ψ₀, T, QTL)
+    return data(sol.states[T_f])
+end

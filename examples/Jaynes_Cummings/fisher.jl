@@ -9,9 +9,6 @@ using GLMakie
 
 # Define parameters and their numerical values
 ps = @cnumbers Δ g κ h 
-dh = 0.000001
-p1 = (0.1, 5, 0.3,0.1-dh/2)
-p2 = (0.1, 5, 0.3,0.1+dh/2)
 
 # Define hilbert space
 hf = FockSpace(:cavity)
@@ -32,10 +29,17 @@ L = [κ*a]
 
 small_ops = [a,a'*a,sz]
 ###########################################################
+Ncutoff = 10
+N_steps = 1000
+
+p = (0.1, 5, 0.3,0.1)
+
+
+
 
 #######################################################
 #Simulate with QuantumToolbox #TODO: get rid of SystemLevelHamiltonian dep for conversion
-Ncutoff = 10
+
 
 QTH1 = convert_to_QT([H],Dict(ps.=>p1),Ncutoff)[1] #Making a list with one element and extracting the one element is because convert_to_QO() is expecting a list
 QTL1 = convert_to_QT(L,Dict(ps.=>p1),Ncutoff)
@@ -45,8 +49,6 @@ QTL2 = convert_to_QT(L,Dict(ps.=>p2),Ncutoff)
 
 Ψ₀ = standard_initial_state(QTH1)
 
-N_steps = 1000
-T = range(0,100,N_steps)
 sol_me1 = mesolve(QTH1,Ψ₀,T, QTL1) #Note that you pass a pure initial state, not a density matrix
 sol_me2 = mesolve(QTH2,Ψ₀,T, QTL2) #Note that you pass a pure initial state, not a density matrix
 
@@ -94,3 +96,5 @@ end
 #TODO: if the states are pure and evolution is unitary, QFI is the variance of the generator of the unitary.
 #TODO: Calculate time series for linear systems. Here the 'local time' measurements should not lose on any info. 
 #Compare to the analytic Laplace transform. 
+
+qfi_val = compute_qfi_fdm(H, L, ps, Ncutoff, Ψ₀, range(0,100,N_steps), 100, p, 4, 1e-6)
