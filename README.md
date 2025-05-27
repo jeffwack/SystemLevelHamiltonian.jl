@@ -1,3 +1,2 @@
 # SystemLevelHamiltonian
-
-[![Build Status](https://github.com/Jeff Wack/SystemLevelHamiltonian.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Jeff Wack/SystemLevelHamiltonian.jl/actions/workflows/CI.yml?query=branch%3Amain)
+<a href="https://jeffwack.github.io/Mandelbrot.jl/dev/"><img src="https://img.shields.io/badge/docs-stable-blue.svg" alt="Documentation of latest stable version"></a>
