@@ -1,5 +1,5 @@
 """
-SLH(inputs, outputs, S, L, H)
+SLH(name, inputs, outputs, S, L, H)
 
 An SLH triple describes an open quantum system. See Combes, arXiv.1611.00375
 """

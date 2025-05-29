@@ -3,8 +3,6 @@ using SystemLevelHamiltonian
 using QuantumCumulants
 using GLMakie
 
-
-
 # Define parameter
 @cnumbers h
 
