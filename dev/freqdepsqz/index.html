@@ -10,12 +10,12 @@ sys = feedbackreduce(sys,:Output_sqz,:Input_filter)
 sys = feedbackreduce(sys,:Output_filter,:Input_ifo)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">SLH(:feqdepsqz, [:Input_sqz], [:Output_ifo], [1.0;;], Vector{QuantumCumulants.QAdd}[[(sqrt(κ_filter)*(a_filter)+sqrt(κ_sqz)*(a_sqz)+sqrt(κ_ifo)*(a_ifo))]], ((0 + 1im)*ϵ_sqz*(a_sqz′*a_sqz′)+(0 - 1im)*ϵ_sqz*(a_sqz*a_sqz)+Δ_filter*(a_filter′*a_filter)+Δ_ifo*(a_ifo′*a_ifo)+Ω_ifo*(b_ifo′*b_ifo)+-g_ifo*(a_ifo′*a_ifo*b_ifo′)+-g_ifo*(a_ifo′*a_ifo*b_ifo)+(0.0 - 0.5im)*sqrt(κ_filter)*sqrt(κ_sqz)*(a_sqz*a_filter′)+(-0.0 + 0.5im)*sqrt(κ_filter)*sqrt(κ_sqz)*(a_sqz′*a_filter)+(0.0 - 0.5im)*sqrt(κ_filter)*sqrt(κ_ifo)*(a_filter*a_ifo′)+(0.0 - 0.5im)*sqrt(κ_ifo)*sqrt(κ_sqz)*(a_sqz*a_ifo′)+(-0.0 + 0.5im)*sqrt(κ_filter)*sqrt(κ_ifo)*(a_filter′*a_ifo)+(-0.0 + 0.5im)*sqrt(κ_ifo)*sqrt(κ_sqz)*(a_sqz′*a_ifo)))</code></pre><pre><code class="language-julia hljs">sys.H</code></pre><p class="math-container">\[1 i \epsilon_{sqz} a_sqz^\dagger a_sqz^\dagger -1 i \epsilon_{sqz} a_{sqz} a_{sqz} + \Delta_{filter} a_filter^\dagger a_{filter} + \Delta_{ifo} a_ifo^\dagger a_{ifo} + \Omega_{ifo} b_ifo^\dagger b_{ifo} -1 g_{ifo} a_ifo^\dagger a_{ifo} b_ifo^\dagger -1 g_{ifo} a_ifo^\dagger a_{ifo} b_{ifo} -0.5 i \sqrt{\kappa_{filter}} \sqrt{\kappa_{sqz}} a_{sqz} a_filter^\dagger + 0.5 i \sqrt{\kappa_{filter}} \sqrt{\kappa_{sqz}} a_sqz^\dagger a_{filter} -0.5 i \sqrt{\kappa_{filter}} \sqrt{\kappa_{ifo}} a_{filter} a_ifo^\dagger -0.5 i \sqrt{\kappa_{ifo}} \sqrt{\kappa_{sqz}} a_{sqz} a_ifo^\dagger + 0.5 i \sqrt{\kappa_{filter}} \sqrt{\kappa_{ifo}} a_filter^\dagger a_{ifo} + 0.5 i \sqrt{\kappa_{ifo}} \sqrt{\kappa_{sqz}} a_sqz^\dagger a_{ifo}\]</p><pre><code class="language-julia hljs">operators(sys)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Set{Any} with 8 elements:
   b_ifo′
   a_ifo
-  a_filter
+  a_ifo′
+  a_sqz′
   a_filter′
   a_sqz
-  a_ifo′
   b_ifo
-  a_sqz′</code></pre><pre><code class="language-julia hljs">parameters(sys)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Set{Any} with 8 elements:
+  a_filter</code></pre><pre><code class="language-julia hljs">parameters(sys)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Set{Any} with 8 elements:
   κ_sqz
   ϵ_sqz
   g_ifo
