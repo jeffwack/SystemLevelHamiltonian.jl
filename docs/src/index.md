@@ -6,7 +6,7 @@ SLH
 ```
 
 ```@docs
-concatenation
+concatenate
 ```
 
 ```@docs
