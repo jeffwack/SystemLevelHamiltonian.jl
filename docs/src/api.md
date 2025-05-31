@@ -4,7 +4,7 @@ SLH
 ```
 
 ```@docs
-concatenation
+concatenate
 ```
 
 ```@docs
@@ -19,10 +19,12 @@ operators
 parameters
 ```
 
-#Quantum information
+# Quantum information
 
 ```@docs
 sld_operator
 ```
 
 ```@docs
+compute_qfi
+```

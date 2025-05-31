@@ -1,8 +1,15 @@
-using Documenter, SystemLevelHamiltonian
+using Documenter
+using SystemLevelHamiltonian
 
 push!(LOAD_PATH,"../src/")
 
-makedocs(sitename="SystemLevelHamiltonian", remotes = nothing)
+pages = ["Introduction" => "index.md",
+         "Examples" => ["freqdepsqz.md", "jcfisher.md"],
+         "API" => "api.md"]
+
+makedocs(sitename="SystemLevelHamiltonian", 
+        pages = pages,
+        remotes = nothing)
 
 deploydocs(
     repo = "github.com/jeffwack/SystemLevelHamiltonian.jl.git"

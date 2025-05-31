@@ -91,6 +91,14 @@ function compute_qfi_alt(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-5)
     return FQ 
 end
 
+"""
+compute_qfi(sys,Ncutoff, T, params, param, backend)
+
+Computes the quantum Fisher information of the final state of the system after evolving for time T, with respect to the parameter 'param.'
+The nominal values of all parameters must be provided as a dictionary mapping parameters to values in 'params.'
+The differentiation required to calculate the symmetric logarithmic derivative is carried out by DifferentiationInterface, so an autodiff backend is passed
+as 'backend.' For now use AutoFiniteDiff(). 
+"""
 function compute_qfi(sys, Ncutoff, T,params, param,backend) 
     symb = collect(keys(params))
     p0 = [params[sy] for sy in symb]
