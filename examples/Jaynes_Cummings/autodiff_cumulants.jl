@@ -47,7 +47,8 @@ Stacktrace:
 
 using QuantumCumulants
 using ModelingToolkit, OrdinaryDiffEq
-using ForwardDiff
+using SciMLSensitivity
+using Zygote
 
 ##############################################################
 ### SYSTEM DEFINITION
@@ -93,15 +94,24 @@ f! = eval(f_expr)
 #NOTE - you must set the type of these numbers to be ComplexF64 to avoid error
 qcu0 = zeros(ComplexF64,length(eqs))#TODO: Are some initial conditions unphysical? For example not all combos of expected values of spin operators should be allowed?
 
-function flatten_complex(x::Vector{ComplexF64})
-    vcat(real.(x), imag.(x))
-end
-
 function fqc(params)
-    _prob = ODEProblem(f!, qcu0, (0.0, 100.0), params)
-    sol = solve(_prob, RK4(); saveat=[100.0])
-    flatten_complex(Array(sol)[:, end])
+    _prob = ODEProblem(f!, qcu0, (0.0, 10.0), params)
+    sol = solve(_prob, RK4())
+    return Array(sol)[:, end]
 end
 
+function jacobi(f, x)
+  y, back = Zygote.pullback(f, x)
+  back(1)[1], back(im)[1]
+end
 
-dx = ForwardDiff.jacobian(fqc, collect(p0))
+function wirtinger(f, x)
+  du, dv = jacobi(f, x)
+  (du' + im*dv')/2, (du + im*dv)/2
+end
+
+dx = wirtinger(fqc, collect(p0))
+
+"""
+What is this output?? It has the same dimensionality as the parameters...
+"""

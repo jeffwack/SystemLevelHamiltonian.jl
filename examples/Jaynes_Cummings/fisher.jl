@@ -2,6 +2,7 @@ using QuantumCumulants
 using SystemLevelHamiltonian
 using QuantumToolbox
 using ModelingToolkit, OrdinaryDiffEq
+using DifferentiationInterface
 
 ##############################################################
 ### SYSTEM DEFINITION
@@ -38,7 +39,7 @@ paramrules = Dict([Δ=>0.1,
                     κ=>0.3])
 
 
-qfiviaL = compute_qfi_fdm(sys, Ncutoff,T, paramrules, h)
+qfi_alt = compute_qfi(sys, Ncutoff,T, paramrules, h,AutoFiniteDiff())
 
 
 

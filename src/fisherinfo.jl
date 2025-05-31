@@ -40,7 +40,7 @@ function sld_operator(rho, drho; eps=1e-5)
 end
 
 
-function compute_qfi(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-5)
+function compute_qfi_old(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-5)
     # Check Hermiticity
     @assert ishermitian(ρ) "ρ is not Hermitian"
     @assert ishermitian(ρ_dot) "ρ_dot is not Hermitian"
@@ -91,7 +91,7 @@ function compute_qfi_alt(ρ::AbstractMatrix, ρ_dot::AbstractMatrix; eps=1e-5)
     return FQ 
 end
 
-function compute_qfi_fdm(sys, Ncutoff, T,params, param) 
+function compute_qfi(sys, Ncutoff, T,params, param,backend) 
     symb = collect(keys(params))
     p0 = [params[sy] for sy in symb]
     idx = findfirst(isequal(param),symb)
@@ -99,10 +99,10 @@ function compute_qfi_fdm(sys, Ncutoff, T,params, param)
     function closure(para)
         p = copy(p0)
         p[idx] = para
-        return simulate_density_matrix(sys, Ncutoff, T,symb, p)  # flatten to 1D vector of real numbers for FiniteDiff
+        return simulate_density_matrix(sys, Ncutoff, T,symb, p)
     end
     ρ = closure(p0[idx])
-    ρ_dot = FiniteDiff.finite_difference_derivative(closure,p0[idx])
+    ρ_dot = derivative(closure,backend,p0[idx])
 
     L_op = sld_operator(ρ, ρ_dot, eps=1e-4)
     return tr(ρ * L_op * L_op)
