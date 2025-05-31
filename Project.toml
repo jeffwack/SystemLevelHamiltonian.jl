@@ -5,9 +5,9 @@ version = "1.0.0-DEV"
 
 [deps]
 ControlSystems = "a6e380b2-a6ca-5380-bf3e-84a91bcd477e"
-Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
-FiniteDiff = "6a86dc24-6348-571c-b903-95158fe2bd41"
+DifferentiationInterface = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
 Integrals = "de52edbc-65ea-441a-8357-d3a637375a31"
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 JumpProcesses = "ccbc3e58-028d-4f4c-8cd5-9ae44345cda5"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MatrixEquations = "99c1a7ee-ab34-5fd5-8076-27c950a045f4"
@@ -22,17 +22,16 @@ SciMLSensitivity = "1ed8b502-d754-442c-8d5d-10ac956f44a1"
 StochasticDiffEq = "789caeaf-c7a9-5a7d-9973-96adeb23e2a0"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
-Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [weakdeps]
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 
 [compat]
 ControlSystems = "1.13.0"
-Enzyme = "0.13.46"
-FiniteDiff = "2.27.0"
+DifferentiationInterface = "0.6.54"
 GLMakie = "0.11.8"
 Integrals = "4.5.0"
+JuMP = "1.26.0"
 JumpProcesses = "9.14.3"
 LinearAlgebra = "1.11.0"
 MatrixEquations = "2.4.5"
@@ -47,7 +46,6 @@ SciMLSensitivity = "7.84.0"
 StochasticDiffEq = "6.76.0"
 SymbolicUtils = "3.27.0"
 Symbolics = "6.38.0"
-Zygote = "0.7.7"
 julia = "1.11.5"
 
 [extras]
