@@ -15,7 +15,7 @@ include("qsymbols.jl")
 export get_qsymbols, promote, QOHamiltonian, check_hilberts, get_numsymbols, convert_to_QT, standard_initial_state
 
 include("slh.jl")
-export SLH, concatenation, feedbackreduce, hilbert, operators
+export SLH, concatenate, feedbackreduce, hilbert, operators
 
 include("componentlibrary.jl")
 export cavity, squeezing_cavity, radiation_pressure_cavity

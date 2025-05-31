@@ -2,6 +2,16 @@
 SLH(name, inputs, outputs, S, L, H)
 
 An SLH triple describes an open quantum system. See Combes, arXiv.1611.00375
+
+The name of the system should be unique. When multiple systems are combined, the names of their inputs and outputs will 
+have the system name appended to them. The inputs and outputs describe 'ports' where signals leave and enter the system.
+Quantum systems must have the same number of inputs and outputs, which we denote by n.
+
+size(S) = (n, n) <- S is an nxn matrix
+size(L) = (n,)
+size(H) = ()
+
+The two ways of combining SLH systems are concatenate() and feedbackreduce()
 """
 struct SLH
     name #should be a symbol
@@ -54,11 +64,11 @@ end
 
 
 """
-concatenation(name, syslist::Vector{SLH})
+concatenate(name, syslist::Vector{SLH})
 
 creates a composite system with no interconnections. Combes eq. 59
 """
-function concatenation(name,syslist)
+function concatenate(name,syslist)
     #To create a combined system, we 'stack' the inputs and outputs of A on top of those of B
 
     #first, we promote the names of inputs and outputs, to prevent naming collisions
