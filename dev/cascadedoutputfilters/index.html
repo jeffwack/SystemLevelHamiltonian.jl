@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>General readout · SystemLevelHamiltonian</title><meta name="title" content="General readout · SystemLevelHamiltonian"/><meta property="og:title" content="General readout · SystemLevelHamiltonian"/><meta property="twitter:title" content="General readout · SystemLevelHamiltonian"/><meta name="description" content="Documentation for SystemLevelHamiltonian."/><meta property="og:description" content="Documentation for SystemLevelHamiltonian."/><meta property="twitter:description" content="Documentation for SystemLevelHamiltonian."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">SystemLevelHamiltonian</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Introduction</a></li><li class="is-active"><a class="tocitem" href>General readout</a><ul class="internal"><li><a class="tocitem" href="#Nominal-parameters"><span>Nominal parameters</span></a></li><li><a class="tocitem" href="#Sanity-check-second-filter-off"><span>Sanity check - second filter off</span></a></li><li><a class="tocitem" href="#sanity-check-late-signal"><span>sanity check - late signal</span></a></li><li><a class="tocitem" href="#increase-signal-amplitude"><span>increase signal amplitude</span></a></li></ul></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="../freqdepsqz/">Calculating the Hamiltonian for frequency-dependent squeezing</a></li><li><a class="tocitem" href="../jcfisher/">Calculating the QFI of a Jaynes-Cummings model</a></li></ul></li><li><a class="tocitem" href="../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>General readout</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>General readout</a></li></ul></nav><div class="docs-right"><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Interferometer-readout"><a class="docs-heading-anchor" href="#Interferometer-readout">Interferometer readout</a><a id="Interferometer-readout-1"></a><a class="docs-heading-anchor-permalink" href="#Interferometer-readout" title="Permalink"></a></h1><p>We want to model a general interferometer readout protocol. We will model different temporal modes of the output signal by using a cascaded series of filters which collect light according to <span>$\kappa_i(t)$</span>, the `filter function.&#39;</p><p>First, we will look at building the Hamiltonian of this cascaded system using the SLH formalism. For now we will model our nonlinear interferometer with the Jaynes-Cummings system. The package SystemLevelHamiltonian.jl implements the SLH composition rules, using the quantum algebra provided by the package QuantumCumulants.jl.</p><pre><code class="language-julia hljs">using SystemLevelHamiltonian
+
+ifo = qed_cavity(:ifo)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">SLH(:ifo, [:In], [:Out], [1], QuantumCumulants.QMul{Nothing}[sqrt(κ_ifo)*(a_ifo)], (g_ifo*(a_ifo′*σ_ifo12)+g_ifo*(a_ifo*σ_ifo21)+Δ_ifo*(a_ifo′*a_ifo)+h_ifo*(a_ifo)+h_ifo*(a_ifo′)))</code></pre><p>Now we create our chain of filters</p><pre><code class="language-julia hljs">filters = [cavity(symb) for symb in [:A,:B]]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element Vector{SLH}:
+ SLH(:A, [:In], [:Out], [1], QuantumCumulants.QMul{Nothing}[sqrt(κ_A)*(a_A)], Δ_A*(a_A′*a_A))
+ SLH(:B, [:In], [:Out], [1], QuantumCumulants.QMul{Nothing}[sqrt(κ_B)*(a_B)], Δ_B*(a_B′*a_B))</code></pre><p>We use the SLH composition rules to assemble our system.</p><pre><code class="language-julia hljs">push!(filters,ifo)
+sys = concatenate(:sys,filters)
+sys = feedbackreduce(sys,:Out_ifo,:In_A)
+sys = feedbackreduce(sys,:Out_A,:In_B)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">SLH(:sys, [:In_ifo], [:Out_B], [1.0;;], Vector{QuantumCumulants.QAdd}[[(sqrt(κ_A)*(a_A)+sqrt(κ_ifo)*(a_ifo)+sqrt(κ_B)*(a_B))]], (Δ_A*(a_A′*a_A)+Δ_B*(a_B′*a_B)+g_ifo*(a_ifo′*σ_ifo12)+g_ifo*(a_ifo*σ_ifo21)+Δ_ifo*(a_ifo′*a_ifo)+h_ifo*(a_ifo)+h_ifo*(a_ifo′)+(0.0 - 0.5im)*sqrt(κ_A)*sqrt(κ_ifo)*(a_A′*a_ifo)+(-0.0 + 0.5im)*conj(conj(conj(sqrt(κ_ifo))))*sqrt(κ_A)*(a_A*a_ifo′)+(0.0 - 0.5im)*sqrt(κ_B)*sqrt(κ_A)*(a_A*a_B′)+(0.0 - 0.5im)*sqrt(κ_B)*sqrt(κ_ifo)*(a_B′*a_ifo)+(-0.0 + 0.5im)*sqrt(κ_B)*sqrt(κ_A)*(a_A′*a_B)+(-0.0 + 0.5im)*sqrt(κ_B)*conj(conj(conj(sqrt(κ_ifo))))*(a_B*a_ifo′)))</code></pre><p>Even with two output filters, this Hamiltonian is a mess. It doesn&#39;t help that for now the symbolic system does not simplify or group terms nicely. We want to represent this Hamiltonian as a matrix to facilitate a density matrix calculation. Automating this procedure is WIP, so let&#39;s do something a bit manual to organize this Hamiltonian.</p><p class="math-container">\[H_0 = Δ_A a_A^\dagger a_A+Δ_B a_B^\dagger a_B +g_{ifo}(a_{ifo}^\dagger σ_{ifo12} + a_{ifo} σ_{ifo21})+Δ_{ifo} a_{ifo}^\dagger a_{ifo}\]</p><p class="math-container">\[H_1 = h_{ifo} (a_{ifo} + a_{ifo}^\dagger)\]</p><p class="math-container">\[H_2 = \frac{i}{2}\sqrt{κ_A κ_{ifo}} (a_A a_{ifo}^\dagger -a_A^\dagger a_{ifo})\]</p><p class="math-container">\[H_3 = \frac{i}{2}\sqrt{κ_B κ_A}(a_A^\dagger a_B - a_A a_B^\dagger)\]</p><p class="math-container">\[H_4 = \frac{i}{2}\sqrt{κ_B κ_{ifo}}(a_B a_{ifo}^\dagger - a_B^\dagger a_{ifo})\]</p><p>Now, we will build this system and simulate its time evolution using the package QuantumToolbox. We will send <span>$\Delta_A$</span> and <span>$\Delta_B$</span> to zero, as well as make the coupling rates <span>$\kappa_A$</span> and <span>$\kappa_B$</span> functions of time.</p><pre><code class="language-julia hljs">using QuantumToolbox</code></pre><p>We first need to establish an order on the subspaces of our Hilbert space, as well as a cutoff for our Fock states.</p><p class="math-container">\[\text{spin} \otimes \text{ifo} \otimes \text{A} \otimes \text{B}\]</p><pre><code class="language-julia hljs">N = 4
+σ  = sigmam() ⊗ qeye(N) ⊗ qeye(N) ⊗ qeye(N)
+a_ifo = qeye(2) ⊗ destroy(N) ⊗ qeye(N) ⊗ qeye(N)
+a_A = qeye(2) ⊗ qeye(N) ⊗ destroy(N) ⊗ qeye(N)
+a_B = qeye(2) ⊗ qeye(N) ⊗ qeye(N) ⊗ destroy(N)</code></pre><p>We can now define our constants and build the first part of the Hamiltonian</p><pre><code class="language-julia hljs">g = 2
+Δ = 0.5
+
+H_0 = Δ*a_ifo&#39;*a_ifo + g*(a_ifo&#39;*σ + a_ifo*σ&#39;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">
+Quantum Object:   type=QuantumToolbox.Operator()   dims=[2, 4, 4, 4]   size=(128, 128)   ishermitian=true
+128×128 SparseArrays.SparseMatrixCSC{ComplexF64, Int64} with 192 stored entries:
+⎡⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠓⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎤
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠱⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠓⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⢄⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⣄⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠓⢄⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠱⢄⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠓⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⢤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠑⢆⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠑⢤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠙⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠑⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⎥
+⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢆⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⎥
+⎣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⎦</code></pre><p>We now define the first time dependent part</p><pre><code class="language-julia hljs">function signal(p,t)
+    return exp(-(t-p.d)^2/p.s^2)*p.A*sin(p.w*t)
+end
+
+H_1 = QobjEvo(a_ifo+a_ifo&#39;, signal)</code></pre><pre><code class="language-julia hljs">kappaifo = 0.3
+
+function kappaA(p,t)
+    return Complex(exp(-(t-p.dA)^2/p.sA^2)*p.AA*sin(p.wA*t))
+end
+
+function kappaB(p,t)
+    return Complex(exp(-(t-p.dB)^2/p.sB^2)*p.AB*sin(p.wB*t))
+end
+
+function f2(p,t)
+    return 1.0im/2*sqrt(kappaA(p,t)*kappaifo)
+end
+H_2 = QobjEvo(a_A*a_ifo&#39; - a_A&#39;*a_ifo,f2)
+
+function f3(p,t)
+    return 1.0im/2*sqrt(kappaB(p,t)*kappaA(p,t))
+end
+H_3 = QobjEvo(a_A&#39;*a_B - a_A*a_B&#39;,f3)
+
+function f4(p,t)
+    return 1.0im/2*sqrt(kappaB(p,t)*kappaifo)
+end
+H_4 = QobjEvo(a_B*a_ifo&#39; - a_B&#39;*a_ifo,f4)
+
+H_total = H_0 + H_1 + H_2 + H_3 + H_4</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">
+Quantum Object Evo.:   type=QuantumToolbox.Operator()   dims=[2, 4, 4, 4]   size=(128, 128)   ishermitian=true   isconstant=false
+(MatrixOperator(128 × 128) + ScalarOperator(0.0 + 0.0im) * MatrixOperator(128 × 128) + ScalarOperator(0.0 + 0.0im) * MatrixOperator(128 × 128) + ScalarOperator(0.0 + 0.0im) * MatrixOperator(128 × 128) + ScalarOperator(0.0 + 0.0im) * MatrixOperator(128 × 128))</code></pre><p>We now have the total Hamiltonian, which we can simulate by providing an initial state as well as parameters for all the time dependent functions.</p><pre><code class="language-julia hljs">ψ0 = basis(2,0) ⊗ fock(N, 0) ⊗ fock(N, 0) ⊗ fock(N, 0)
+tlist = 0:0.1:100
+
+p = (
+    d = 5, #center of signal pulse
+    s = 2, #width of signal pulse
+    A = 4, #amplitude of signal pulse
+    w = 3*2*pi, #frequency of signal pulse
+    dA = 3, #center
+    sA = 2, #width
+    AA = 2, #amplitude
+    wA = 2*2*pi, #frequency
+    dB = 8, #center
+    sB = 2, #width
+    AB = 2, #amplitude
+    wB = 4*2*pi #frequency
+)
+
+sol_me  = mesolve(H_total,  ψ0, tlist, params = p)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Solution of time evolution
+(return code: Success)
+--------------------------
+num_states = 1001
+num_expect = 0
+ODE alg.: OrdinaryDiffEqTsit5.Tsit5{typeof(OrdinaryDiffEqCore.trivial_limiter!), typeof(OrdinaryDiffEqCore.trivial_limiter!), Static.False}(OrdinaryDiffEqCore.trivial_limiter!, OrdinaryDiffEqCore.trivial_limiter!, static(false))
+abstol = 1.0e-8
+reltol = 1.0e-6
+</code></pre><p>Now, we want to calculate the quantum Fisher information of the final state left in the filters with respect to the frequency of the signal (for example). To do this, we are going to wrap this solver call in a function which takes a frequency, time evolves, extracts the final state, and traces out the interferometer. This will then allow us to use the finite difference method to calculate the derivative with respect to a parameter and calculate the QFI.</p><pre><code class="language-julia hljs">function final_state(omega)
+    p = (
+        d = 5, #center of signal pulse
+        s = 2, #width of signal pulse
+        A = 4, #amplitude of signal pulse
+        w = omega, #frequency of signal pulse
+        dA = 3, #center
+        sA = 2, #width
+        AA = 2, #amplitude
+        wA = 2*2*pi, #frequency
+        dB = 8, #center
+        sB = 2, #width
+        AB = 2, #amplitude
+        wB = 4*2*pi #frequency
+    )
+
+    sol_me  = mesolve(H_total,  ψ0, tlist, params = p)
+    rho = ptrace(sol_me.states[end],(3,4))
+    return hermitian_data(rho)
+end
+
+final_state(3*2*pi)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">16×16 Matrix{ComplexF64}:
+     0.991873+0.0im          …    9.61716e-8-9.09681e-8im
+  -5.01644e-5-0.000118818im     -1.22202e-11-9.30754e-11im
+ -0.000454612-0.000905623im     -2.66048e-10-9.77298e-11im
+   8.18787e-5+8.65377e-5im       3.32911e-11+2.19757e-12im
+ -0.000183892+2.37099e-5im       1.27208e-10+2.4713e-10im
+ -0.000209538-0.000215858im  …  -8.50183e-11-8.16506e-12im
+  -4.12425e-5+4.37888e-6im      -8.26885e-12+8.24427e-12im
+   -1.5653e-5-2.42436e-5im      -7.95094e-12-1.82761e-12im
+  -5.66176e-5-3.14811e-5im      -1.18901e-11+6.5457e-12im
+  -2.45605e-5+2.00545e-5im       1.43714e-13+9.71092e-12im
+   1.42538e-5-5.08985e-6im   …   2.04559e-12-3.70144e-12im
+  -1.38019e-7+3.5115e-7im        4.63325e-14+9.37875e-14im
+   7.21348e-6+1.98748e-5im       2.61284e-12+1.12805e-12im
+   9.59475e-6+8.70784e-7im       2.15836e-12-1.58206e-12im
+  -7.22915e-7-9.96253e-8im        -1.602e-13+1.3018e-13im
+   9.61716e-8+9.09681e-8im   …   3.72788e-14+0.0im</code></pre><pre><code class="language-julia hljs">function derivative(A,dA)
+    rho1 = final_state(A)
+    rho2 = final_state(A+dA)
+
+    return (rho1, rho2, (rho2 - rho1)/dA)
+end
+
+(rho1, rho2, rhodot) = derivative(3*2*pi,0.001)
+
+L = sld_operator(rho1,rhodot)
+
+qfi = tr(L*L*rho1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.06101882572685508 - 3.1402767280789332e-18im</code></pre><p>We can wrap all of this into a single function which will output the QFI of the system as a whole as well as each subsystem</p><pre><code class="language-julia hljs">function all_qfi(p,eps)
+
+    sol_me = mesolve(H_total,  ψ0, tlist, params = p)
+    rho_final = ket2dm(sol_me.states[end])
+
+    pp= merge(p,(w=p.w+eps,))
+    sol_me_prime = mesolve(H_total,  ψ0, tlist, params = pp)
+    rho_final_prime = ket2dm(sol_me_prime.states[end])
+
+    rho_dot_full = (hermitian_data(rho_final_prime) - hermitian_data(rho_final))/eps
+
+    L_full = sld_operator(hermitian_data(rho_final),rho_dot_full)
+    qfi_full = real(tr(L_full*L_full*hermitian_data(rho_final)))
+    println(&quot;qfi_full = $qfi_full&quot;)
+
+    rho_ifo = ptrace(rho_final,(1,2))
+    rho_ifo_prime = ptrace(rho_final_prime,(1,2))
+    rho_dot_ifo = (hermitian_data(rho_ifo_prime) - hermitian_data(rho_ifo))/eps
+    L_ifo = sld_operator(hermitian_data(rho_ifo),rho_dot_ifo)
+    qfi_ifo = real(tr(L_ifo*L_ifo*hermitian_data(rho_ifo)))
+    println(&quot;qfi_ifo = $qfi_ifo&quot;)
+
+    rho_filters = ptrace(rho_final,(3,4))
+    rho_filters_prime = ptrace(rho_final_prime,(3,4))
+    rho_dot_filters = (hermitian_data(rho_filters_prime) - hermitian_data(rho_filters))/eps
+    L_filters = sld_operator(hermitian_data(rho_filters),rho_dot_filters)
+    qfi_filters = real(tr(L_filters*L_filters*hermitian_data(rho_filters)))
+    println(&quot;qfi_filters = $qfi_filters&quot;)
+
+    rho_A = ptrace(rho_final,3)
+    rho_A_prime = ptrace(rho_final_prime,3)
+    rho_dot_A = (hermitian_data(rho_A_prime) - hermitian_data(rho_A))/eps
+    L_A = sld_operator(hermitian_data(rho_A),rho_dot_A)
+    qfi_A = real(tr(L_A*L_A*hermitian_data(rho_A)))
+    println(&quot;qfi_A = $qfi_A&quot;)
+
+    rho_B = ptrace(rho_final,4)
+    rho_B_prime = ptrace(rho_final_prime,4)
+    rho_dot_B = (hermitian_data(rho_B_prime) - hermitian_data(rho_B))/eps
+    L_B = sld_operator(hermitian_data(rho_B),rho_dot_B)
+    qfi_B = real(tr(L_B*L_B*hermitian_data(rho_B)))
+    println(&quot;qfi_B = $qfi_B&quot;)
+
+
+    return
+end
+
+eps = 0.0005</code></pre><h2 id="Nominal-parameters"><a class="docs-heading-anchor" href="#Nominal-parameters">Nominal parameters</a><a id="Nominal-parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Nominal-parameters" title="Permalink"></a></h2><pre><code class="language-julia hljs">p_nominal = (
+    d = 5, #center of signal pulse
+    s = 2, #width of signal pulse
+    A = 4, #amplitude of signal pulse
+    w = 3*2*pi, #frequency of signal pulse
+    dA = 3, #center
+    sA = 2, #width
+    AA = 2, #amplitude
+    wA = 2*2*pi, #frequency
+    dB = 8, #center
+    sB = 2, #width
+    AB = 2, #amplitude
+    wB = 4*2*pi #frequency
+    )
+all_qfi(p_nominal,eps)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Progress: [==============================] 100.0% --- Elapsed Time: 0h 00m 00s (ETA: 0h 00m 00s)
+Progress: [==============================] 100.0% --- Elapsed Time: 0h 00m 00s (ETA: 0h 00m 00s)
+qfi_full = 0.24045544113368622
+qfi_ifo = 0.05866214145981759
+qfi_filters = 0.17748928922700064
+qfi_A = 0.0008089985839518995
+qfi_B = 0.12115758718911955</code></pre><h2 id="Sanity-check-second-filter-off"><a class="docs-heading-anchor" href="#Sanity-check-second-filter-off">Sanity check - second filter off</a><a id="Sanity-check-second-filter-off-1"></a><a class="docs-heading-anchor-permalink" href="#Sanity-check-second-filter-off" title="Permalink"></a></h2><pre><code class="language-julia hljs">p = merge(p_nominal,(AB=0,))
+all_qfi(p,eps)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Progress: [==============================] 100.0% --- Elapsed Time: 0h 00m 00s (ETA: 0h 00m 00s)
+Progress: [==============================] 100.0% --- Elapsed Time: 0h 00m 00s (ETA: 0h 00m 00s)
+qfi_full = 0.1964976126783722
+qfi_ifo = 0.1884578778914792
+qfi_filters = 0.1706741039777998
+qfi_A = 0.17067410397779992
+qfi_B = 0.00045653332689608747</code></pre><h2 id="sanity-check-late-signal"><a class="docs-heading-anchor" href="#sanity-check-late-signal">sanity check - late signal</a><a id="sanity-check-late-signal-1"></a><a class="docs-heading-anchor-permalink" href="#sanity-check-late-signal" title="Permalink"></a></h2><pre><code class="language-julia hljs">p = merge(p_nominal,(d=50,))
+all_qfi(p,eps)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Progress: [==============================] 100.0% --- Elapsed Time: 0h 00m 00s (ETA: 0h 00m 00s)
+Progress: [==============================] 100.0% --- Elapsed Time: 0h 00m 00s (ETA: 0h 00m 00s)
+qfi_full = 8.505711181134919e-7
+qfi_ifo = 8.504982860701582e-7
+qfi_filters = 1.983496688342785e-15
+qfi_A = 1.9736883925777066e-15
+qfi_B = 1.888241272533022e-15</code></pre><h2 id="increase-signal-amplitude"><a class="docs-heading-anchor" href="#increase-signal-amplitude">increase signal amplitude</a><a id="increase-signal-amplitude-1"></a><a class="docs-heading-anchor-permalink" href="#increase-signal-amplitude" title="Permalink"></a></h2><pre><code class="language-julia hljs">p = merge(p_nominal,(A=p_nominal.A*4,))
+all_qfi(p,eps)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Progress: [==============================] 100.0% --- Elapsed Time: 0h 00m 00s (ETA: 0h 00m 00s)
+Progress: [==============================] 100.0% --- Elapsed Time: 0h 00m 00s (ETA: 0h 00m 00s)
+qfi_full = 0.847639547372202
+qfi_ifo = 0.61190892480424
+qfi_filters = 0.26508383308929107
+qfi_A = 0.053017756419404524
+qfi_B = 0.2392701103783253</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../freqdepsqz/">Calculating the Hamiltonian for frequency-dependent squeezing »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.11.4 on <span class="colophon-date" title="Tuesday 3 June 2025 08:39">Tuesday 3 June 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
