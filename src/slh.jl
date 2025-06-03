@@ -21,6 +21,7 @@ struct SLH
     L #size n
     H #has operators which act on hilbert
 end
+#TODO: you should not be able to construct this if dimensions are wrong.
 
 """
 hilbert(sys:SLH)
