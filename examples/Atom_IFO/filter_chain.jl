@@ -29,11 +29,12 @@ ifo = SLH(:sys, [:in_a,:in_b,:in_atom],[:out_a,:out_b,:out_atom],[1],L,H)
 
 #Define the filter cavity 
 hilb = FockSpace(:cavA)
-a = Destroy(hilb,Symbol(:a,:_,:cavA))
+a_A = Destroy(hilb,Symbol(:a,:_,:cavA))
 
-@syms t::Real
-@register_symbolic κ_A(t)
-κ_A(t) = exp(-(t-10)^2/4)
+
+function κ_A(t) 
+    return exp(-(t-10)^2/4)
+end
 
 Δ_A = rnumbers(:Δ_A)
 
@@ -41,5 +42,25 @@ filter_A = SLH(:cavA,
                 [:Input],
                 [:Output],
                 [1],
-                [κ_A(t)*a],
-                Δ_A*adjoint(a)*a)
+                [κ_A(t)*a_A],
+                Δ_A*adjoint(a_A)*a_A)
+
+
+#Define the filter cavity 
+hilb = FockSpace(:cavB)
+a_B = Destroy(hilb,Symbol(:a,:_,:cavA))
+
+
+function κ_B(t) 
+    return exp(-(t-15)^2/4)
+end
+
+Δ_B = rnumbers(:Δ_B)
+
+filter_A = SLH(:cavB,
+                [:Input],
+                [:Output],
+                [1],
+                [κ_B(t)*a_B],
+                Δ_B*adjoint(a_B)*a_B)
+

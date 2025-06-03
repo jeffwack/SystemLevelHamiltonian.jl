@@ -18,7 +18,7 @@ include("slh.jl")
 export SLH, concatenate, feedbackreduce, hilbert, operators, parameters
 
 include("componentlibrary.jl")
-export cavity, squeezing_cavity, radiation_pressure_cavity
+export cavity, squeezing_cavity, radiation_pressure_cavity, qed_cavity
 
 include("fisherinfo.jl")
 export sld_operator, compute_qfi, compute_qfi_alt, simulate_density_matrix, hermitian_data

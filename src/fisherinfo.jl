@@ -13,7 +13,7 @@ eigenbasis method. Returns `L` in the original basis.
 # Returns
 - `L`: Symmetric logarithmic derivative (N×N Hermitian matrix)
 """
-function sld_operator(rho, drho; eps=1e-5)
+function sld_operator(rho, drho; eps=1e-6)
     @assert size(rho) == size(drho) "rho and drho must be the same size"
     @assert issymmetric(rho) || ishermitian(rho) "rho must be Hermitian"
     @assert ishermitian(drho) "drho must be Hermitian"

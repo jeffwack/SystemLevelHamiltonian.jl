@@ -8,8 +8,8 @@ sqz_cav = squeezing_cavity(:sqz)
 ifo = radiation_pressure_cavity(:ifo)
 
 sys = concatenate(:feqdepsqz,[sqz_cav,filter_cav,ifo])
-sys = feedbackreduce(sys,:Output_sqz,:Input_filter)
-sys = feedbackreduce(sys,:Output_filter,:Input_ifo)
+sys = feedbackreduce(sys,:Out_sqz,:In_filter)
+sys = feedbackreduce(sys,:Out_filter,:In_ifo)
 ```
 
 ```@example freqdepsqz
