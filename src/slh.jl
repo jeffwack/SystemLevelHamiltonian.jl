@@ -21,7 +21,13 @@ struct SLH
     L #size n
     H #has operators which act on hilbert
 end
+#TODO: you should not be able to construct this if dimensions are wrong.
 
+"""
+hilbert(sys:SLH)
+
+returns the hilbert space of the Hamiltonian of the given system.
+"""
 function hilbert(sys::SLH)
     ops = operators(sys) 
     if check_hilberts(sum(ops)) #Have to sum because check_hilberts() is expecting an expression
@@ -31,9 +37,24 @@ function hilbert(sys::SLH)
     end
 end
 
+"""
+operators(sys)
+
+returns all the quantum operators contained in the system's Hamiltonian.
+"""
 function operators(sys)
     return get_qsymbols(sys.H)
 end
+
+"""
+parameters(sys)
+
+returns all the symbolic numbers contained in the system's Hamiltonian and coupling vector L.
+"""
+function parameters(sys::SLH)
+    return union(get_numsymbols(sys.H),get_numsymbols(sys.L...))
+end
+
 
 #This function is for QuantumCumulants operators
 function promote(operator,product_space)
@@ -165,11 +186,3 @@ function convert_to_QT(sys::SLH,Ncutoff,paramrules)
     return (SLH(name,sys.inputs, sys.outputs, sys.S, QTL,QTH),standard_initial_state(QTH))
 end
 
-#TODO in what cases could S and L have independent ops?
-function get_qsymbols(sys::SLH)
-    return get_qsymbols(sys.H)
-end
-
-function get_numsymbols(sys::SLH)
-    return union(get_numsymbols(sys.H),get_numsymbols(sys.L...))
-end
