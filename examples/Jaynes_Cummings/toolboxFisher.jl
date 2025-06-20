@@ -1,6 +1,4 @@
 using QuantumToolbox
-using SystemLevelHamiltonian
-
 
 function final_state(A)
     #Example from QT docs
@@ -39,14 +37,10 @@ function final_state(A)
 end
 
 function derivative(A,dA)
-    rho1 = hermitian_data(final_state(A))
-    rho2 = hermitian_data(final_state(A+dA))
+    rho1 = final_state(A).data
+    rho2 = final_state(A+dA).data
     
     return (rho1, rho2, (rho2 - rho1)/dA)
 end
 
-(rho1, rho2, rhodot) = derivative(3,1)
-
-L = sld_operator(rho1,rhodot)
-
-qfi = tr(L*L*rho1)
+(rho1, rho2, rhodot) = derivative(3,0.01)

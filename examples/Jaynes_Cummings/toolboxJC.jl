@@ -36,21 +36,14 @@ eop_ls = [
     (e_ket * e_ket') ⊗ qeye(N), # excited state population in atom
 ]
 
-# Collapse operators for interaction with the environment with variable dissipation rates 
-# and thermal energy of the environment. `n_thermal()` gives Bose-Einstein distribution
-cop_ls(_γ, _κ, _KT) = (
-    √(_κ * n_thermal(ωc, _KT)) * a', 
-    √(_κ * (1 + n_thermal(ωc, _KT))) * a, 
-    √(_γ * n_thermal(ωa, _KT)) * σ', 
-    √(_γ * (1 + n_thermal(ωa, _KT))) * σ, 
-)
 
 γ = 4e-3
 κ = 7e-3
-KT = 0 # thermal field at zero temperature
+
+L = [sqrt(κ)*a,sqrt(γ)* σ]
 
 # `mesolve()` only has one additional keyword argument `c_ops` from `sesolve()`
-sol_me  = mesolve(Htot,  ψ0, tlist, cop_ls(γ, κ, KT), e_ops = eop_ls)
+sol_me  = mesolve(Htot,  ψ0, tlist,L , e_ops = eop_ls)
 
 n_me = real.(sol_me.expect[1, :])
 e_me = real.(sol_me.expect[2, :])

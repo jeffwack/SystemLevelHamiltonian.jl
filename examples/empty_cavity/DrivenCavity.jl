@@ -31,7 +31,7 @@ Laser = SLH(["BRIGHT"],
 #############################################################
 #connect the subsystems
 
-sys = concatenation(Laser,FPcavity)
+sys = concatenate(:sys,[Laser,FPcavity])
 
 sys = feedbackreduce(sys,"BRIGHT","LEFT")
 

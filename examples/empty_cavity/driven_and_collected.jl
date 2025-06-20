@@ -47,8 +47,7 @@ collector = SLH(["INPUT"],
 
 #connect the subsystems
 
-system = concatenation(Laser,FPcavity)
-system = concatenation(system, collector)
+system = concatenate(:sys, [Laser,FPcavity,collector])
 
 system = feedbackreduce(system,"BRIGHT","LEFT")
 system = feedbackreduce(system,"RIGHT","INPUT")
