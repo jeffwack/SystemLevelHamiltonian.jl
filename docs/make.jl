@@ -5,12 +5,12 @@ push!(LOAD_PATH,"../src/")
 
 pages = ["Introduction" => "index.md",
          "General readout" => "cascadedoutputfilters.md",
-         "Examples" => ["freqdepsqz.md", "jcfisher.md"],
+         "Examples" => ["freqdepsqz.md", "jcfisher.md","oameyeQFI.md"],
          "API" => "api.md"] 
 
 makedocs(sitename="SystemLevelHamiltonian", 
         pages = pages,
-        remotes = nothing)
+        remotes = nothing)  
 
 deploydocs(
     repo = "github.com/jeffwack/SystemLevelHamiltonian.jl.git"
