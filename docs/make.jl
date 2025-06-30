@@ -5,7 +5,7 @@ push!(LOAD_PATH,"../src/")
 
 pages = ["Introduction" => "index.md",
          "General readout" => "cascadedoutputfilters.md",
-         "Linear IFO" => "linearsystems.md",
+         "Linear IFO" => ["ifoQT.md", "ifoQC.md"],
          "Examples" => ["freqdepsqz.md", "jcfisher.md","oameyeQFI.md"],
          "API" => "api.md"] 
 
