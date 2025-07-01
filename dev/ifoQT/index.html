@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Linear Quantum System - QuantumToolbox · SystemLevelHamiltonian</title><meta name="title" content="Linear Quantum System - QuantumToolbox · SystemLevelHamiltonian"/><meta property="og:title" content="Linear Quantum System - QuantumToolbox · SystemLevelHamiltonian"/><meta property="twitter:title" content="Linear Quantum System - QuantumToolbox · SystemLevelHamiltonian"/><meta name="description" content="Documentation for SystemLevelHamiltonian."/><meta property="og:description" content="Documentation for SystemLevelHamiltonian."/><meta property="twitter:description" content="Documentation for SystemLevelHamiltonian."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">SystemLevelHamiltonian</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Introduction</a></li><li><a class="tocitem" href="../cascadedoutputfilters/">General readout</a></li><li><span class="tocitem">Linear IFO</span><ul><li class="is-active"><a class="tocitem" href>Linear Quantum System - QuantumToolbox</a></li><li><a class="tocitem" href="../ifoQC/">Linear Interferometer Readout - QuantumCumulants</a></li></ul></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="../freqdepsqz/">Calculating the Hamiltonian for frequency-dependent squeezing</a></li><li><a class="tocitem" href="../jcfisher/">Calculating the QFI of a Jaynes-Cummings model</a></li><li><a class="tocitem" href="../oameyeQFI/">Quantum Fisher Information</a></li></ul></li><li><a class="tocitem" href="../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Linear IFO</a></li><li class="is-active"><a href>Linear Quantum System - QuantumToolbox</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Linear Quantum System - QuantumToolbox</a></li></ul></nav><div class="docs-right"><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Linear-Quantum-System-QuantumToolbox"><a class="docs-heading-anchor" href="#Linear-Quantum-System-QuantumToolbox">Linear Quantum System - QuantumToolbox</a><a id="Linear-Quantum-System-QuantumToolbox-1"></a><a class="docs-heading-anchor-permalink" href="#Linear-Quantum-System-QuantumToolbox" title="Permalink"></a></h1><pre><code class="language-julia hljs">using QuantumToolbox</code></pre><pre><code class="language-julia hljs">N = 4
+a = destroy(N) ⊗ qeye(N)
+b = qeye(N) ⊗ destroy(N)
+
+H1 = QobjEvo(b&#39;*b, (p,t)-&gt;p[1])
+H2 = QobjEvo(a&#39;*b+a*b&#39;, (p,t)-&gt;p[2])
+
+H = H1+H2
+
+L = [QobjEvo(a, (p,t)-&gt;p[3])]</code></pre><pre><code class="language-julia hljs">tlist = LinRange(0, 100, 1000)
+p0 = [0.01,500,10]
+ψ0= basis(N,0) ⊗ basis(N,0)
+
+eops = [a, a&#39;*a,b,b&#39;*b]
+
+sol = mesolve(H, ψ0, tlist, L;params = p0,e_ops=eops)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Progress: [                              ]   0.1% --- Elapsed Time: 0h 00m 01s (ETA: 0h 16m 39s)Progress: [==============================] 100.0% --- Elapsed Time: 0h 00m 01s (ETA: 0h 00m 00s)</code></pre><pre><code class="language-julia hljs">using CairoMakie
+
+fig = Figure()
+ax = Axis(fig[1,1])
+
+lines!(ax,tlist,real(sol.expect[2,:]),label = L&quot;$\langle a&#39; a \rangle$&quot; )
+lines!(ax,tlist,real(sol.expect[4,:]),label = L&quot;$\langle b&#39; b \rangle$&quot; )
+axislegend()
+
+fig</code></pre><img src="041f728f.png" alt="Example block output"/><pre><code class="language-julia hljs">corr = correlation_2op_1t(H,ψ0,tlist,L,a,a&#39;;params = p0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1000-element Vector{ComplexF64}:
+                    1.0 + 0.0im
+    0.07986001624328848 - 3.9731316894605794e-5im
+   0.005871377381967757 - 5.749753367751837e-6im
+   0.000389245361000245 - 5.593764189857812e-7im
+  2.2116862388556264e-5 - 4.0749424362485466e-8im
+  1.0929703570931246e-6 - 2.293473585107393e-9im
+   6.812087915789466e-8 - 6.770189850933705e-11im
+  -2.533835944059366e-7 + 1.0321212067398758e-9im
+  -5.106403660917553e-7 + 2.0401422310365902e-9im
+  -4.978981335651292e-7 + 1.952672906410565e-9im
+                        ⋮
+  -4.790136117811723e-7 + 1.6412493581626611e-7im
+ -2.5007463873329194e-7 + 1.515140236210815e-8im
+  1.0735832232270663e-7 - 1.421256500544251e-7im
+  4.0972120270070865e-7 - 2.2693727416246074e-7im
+   5.034287868057011e-7 - 1.9611995913347698e-7im
+   3.398965343398423e-7 - 6.468086137762786e-8im
+  1.7135245399957436e-9 + 1.0049944587187889e-7im
+ -3.3720744357290024e-7 + 2.1446060724246557e-7im
+  -4.857387278038006e-7 + 2.138510026070482e-7im</code></pre><pre><code class="language-julia hljs">(omega, S) = spectrum_correlation_fft(tlist,corr)
+
+fig = Figure()
+ax = Axis(fig[1,1],xscale = log10, yscale = log10)
+nz = Int(ceil(length(omega)/2+1))
+
+lines!(ax, omega[nz:end],S[nz:end])
+
+fig</code></pre><img src="6265f5de.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../cascadedoutputfilters/">« General readout</a><a class="docs-footer-nextpage" href="../ifoQC/">Linear Interferometer Readout - QuantumCumulants »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.13.0 on <span class="colophon-date" title="Tuesday 1 July 2025 16:44">Tuesday 1 July 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
