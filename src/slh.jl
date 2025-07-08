@@ -186,3 +186,111 @@ function convert_to_QT(sys::SLH,Ncutoff,paramrules)
     return (SLH(name,sys.inputs, sys.outputs, sys.S, QTL,QTH),standard_initial_state(QTH))
 end
 
+"""
+extract_creation_annihilation_operators(sys::SLH)
+
+Extract all creation and annihilation operators from the system's Hamiltonian and coupling operators.
+Returns a vector of operators ordered as [a₁, a₁†, a₂, a₂†, ...] for each bosonic mode.
+"""
+function extract_creation_annihilation_operators(sys::SLH)
+    # Get all operators from H and L
+    H_ops = get_qsymbols(sys.H)
+    L_ops = union([get_qsymbols(L_term) for L_term in sys.L]...)
+    all_ops = union(H_ops, L_ops)
+    
+    # Group operators by their base mode (assuming they have a common structure)
+    creation_ops = filter(op -> op isa Create, all_ops)
+    annihilation_ops = filter(op -> op isa Destroy, all_ops)
+    
+    # Sort by mode index or name to ensure consistent ordering
+    sort!(creation_ops, by = op -> op.name)
+    sort!(annihilation_ops, by = op -> op.name)
+    
+    # Build the operator vector [a₁, a₁†, a₂, a₂†, ...]
+    operators = []
+    for (create_op, destroy_op) in zip(creation_ops, annihilation_ops)
+        push!(operators, destroy_op)  # annihilation operator
+        push!(operators, create_op)   # creation operator
+    end
+    
+    return operators
+end
+
+"""
+check_linearity(expr)
+
+Check if an expression contains only linear terms (up to second order in bosonic operators).
+Returns true if linear, false if nonlinear (third+ order products or fermionic operators).
+"""
+function check_linearity(expr)
+    # TODO: Implement check for third+ order products of bosonic operators
+    # TODO: Implement check for fermionic operators
+    # For now, assume all systems are linear
+    return true
+end
+
+"""
+build_drift_matrix(H, operators)
+
+Build the drift matrix A from the Hamiltonian H for the given operator ordering.
+The A matrix describes how the operators evolve: d/dt [operators] = A * [operators] + ...
+Throws an error if the system is nonlinear.
+"""
+function build_drift_matrix(H, operators)
+    # Check if the system is linear
+    if !check_linearity(H)
+        throw(ArgumentError("This system is not linear and thus cannot be represented in state space form."))
+    end
+    
+    n = length(operators)
+    A = zeros(Symbolics.Num, n, n)
+    
+    # TODO: For each operator, compute its time derivative from the Hamiltonian
+    # TODO: Use commutation relation: d/dt a = (i/ℏ)[H, a] with ℏ = 1
+    # TODO: Express result in terms of basis operators to fill A matrix
+    
+    return A
+end
+
+"""
+build_coupling_matrices(L, operators)
+
+Build the coupling matrices B and C from the dissipation operators L.
+B describes input-to-state coupling, C describes state-to-output coupling.
+"""
+function build_coupling_matrices(L, operators)
+    n = length(operators)
+    m = length(L)  # number of input/output channels
+    
+    B = zeros(Symbolics.Num, n, m)
+    C = zeros(Symbolics.Num, m, n)
+    
+    # TODO: For each L operator, determine its coupling to the state vector
+    # TODO: B matrix: how inputs couple into the system
+    # TODO: C matrix: how system operators couple to outputs
+    
+    return B, C
+end
+
+"""
+SLH2ABCD(sys::SLH)
+
+Convert an SLH system to ABCD state-space representation.
+Returns (A, B, C, D) matrices where:
+- A: drift matrix (state evolution)
+- B: input coupling matrix
+- C: output coupling matrix  
+- D: direct feedthrough matrix (from S matrix)
+"""
+function SLH2ABCD(sys::SLH)
+    # Extract creation/annihilation operators
+    operators = extract_creation_annihilation_operators(sys)
+    
+    # Build matrices
+    A = build_drift_matrix(sys.H, operators)
+    B, C = build_coupling_matrices(sys.L, operators)
+    D = sys.S  # Direct feedthrough from scattering matrix
+    
+    return A, B, C, D
+end
+

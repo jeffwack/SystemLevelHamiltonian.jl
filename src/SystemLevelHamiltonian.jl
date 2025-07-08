@@ -16,6 +16,7 @@ export get_qsymbols, promote, QOHamiltonian, check_hilberts, get_numsymbols, con
 
 include("slh.jl")
 export SLH, concatenate, feedbackreduce, hilbert, operators, parameters
+export extract_creation_annihilation_operators, check_linearity, build_drift_matrix, build_coupling_matrices, SLH2ABCD
 
 include("componentlibrary.jl")
 export cavity, squeezing_cavity, radiation_pressure_cavity, qed_cavity
