@@ -105,7 +105,7 @@ end
 #TODO: see if this can be replaced with QuantumCumulants' fundamental_operators()
 #does not seem to be the case, fundamental_operators() works on a hilbert space
 function get_qsymbols(expr)
-    if Symbolics.istree(expr)
+    if Symbolics.iscall(expr)
         return union(get_qsymbols.(Symbolics.arguments(expr))...)
     else
         return (expr isa Number) || (expr isa SymbolicUtils.Symbolic) ? Set() : Set([expr])
@@ -113,7 +113,7 @@ function get_qsymbols(expr)
 end 
 
 function get_numsymbols(expr)
-    if Symbolics.istree(expr)
+    if Symbolics.iscall(expr)
         return union(get_numsymbols.(Symbolics.arguments(expr))...)
     else
         return (expr isa SymbolicUtils.Symbolic) ? Set([expr]) : Set() 
@@ -140,7 +140,7 @@ function get_additive_terms(expr)
     Returns:
         Vector: List of terms without addition operators
     """
-    if Symbolics.istree(expr)
+    if Symbolics.iscall(expr)
         op = Symbolics.operation(expr)
         args = Symbolics.arguments(expr)
         

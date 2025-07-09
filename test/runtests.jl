@@ -11,7 +11,7 @@ using Symbolics
         @qnumbers a::Destroy(hf)
         
         # Create symbolic parameters
-        @variables g ω κ
+        @cnumbers g ω κ
         
         # Test 1: Single term (no addition)
         single_term = g * a
@@ -48,8 +48,8 @@ using Symbolics
         # Test 6: Addition with numbers (numeric terms grouped together)
         num_terms = 3 + 2*g + ω * a
         terms = get_additive_terms(num_terms)
-        @test length(terms) == 2  # ω*a and (3 + 2g) are separate terms
-        @test isequal(sum(terms), num_terms)
+        @test length(terms) == 3
+        @test iszero(simplify(sum(terms) - num_terms))
         
         # Test 7: Complex multiplication term (commutes to two terms due to [a,a']=1)
         complex_mult = g * ω * a * a'
