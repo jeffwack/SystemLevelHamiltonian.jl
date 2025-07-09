@@ -50,6 +50,33 @@ Documentation is built using Documenter.jl and includes:
 - Examples for IFO models (both QuantumCumulants and QuantumToolbox implementations)
 - Frequency-dependent squeezing examples
 - Quantum Fisher Information examples
+- SLH to ABCD conversion examples
+
+#### Documentation Structure
+```
+docs/
+├── make.jl              # Documenter.jl configuration
+├── Project.toml         # Documentation dependencies
+├── Manifest.toml        # Locked dependencies
+├── build/               # Generated documentation (gitignored)
+└── src/                 # Source markdown files
+    ├── index.md         # Main documentation page
+    ├── api.md           # API documentation
+    ├── cascadedoutputfilters.md
+    ├── freqdepsqz.md
+    ├── ifoQC.md
+    ├── ifoQT.md
+    ├── jcfisher.md
+    ├── oameyeQFI.md
+    └── slh_to_abcd.md   # SLH to ABCD conversion examples
+```
+
+#### Adding Documentation Pages
+When adding new documentation pages:
+1. Create the markdown file in `docs/src/`
+2. Use `@example` blocks for executable Julia code
+3. Update `docs/make.jl` to include the new page in the `pages` array
+4. The `pages` array controls both the navigation structure and build order
 
 ### Testing
 

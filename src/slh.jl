@@ -187,46 +187,83 @@ function convert_to_QT(sys::SLH,Ncutoff,paramrules)
 end
 
 """
-extract_creation_annihilation_operators(sys::SLH)
+    ordered_ops(sys::SLH)
 
 Extract all creation and annihilation operators from the system's Hamiltonian and coupling operators.
 Returns a vector of operators ordered as [a₁, a₁†, a₂, a₂†, ...] for each bosonic mode.
 """
-function extract_creation_annihilation_operators(sys::SLH)
+function ordered_ops(sys::SLH)
     # Get all operators from H and L
     H_ops = get_qsymbols(sys.H)
     L_ops = union([get_qsymbols(L_term) for L_term in sys.L]...)
     all_ops = collect(union(H_ops, L_ops))
     
-    # Group operators by their base mode (assuming they have a common structure)
+    # Group operators by their base mode name
     creation_ops = filter(op -> op isa Create, all_ops)
     annihilation_ops = filter(op -> op isa Destroy, all_ops)
     
-    # Sort by mode index or name to ensure consistent ordering
-    sort!(creation_ops, by = op -> op.name)
-    sort!(annihilation_ops, by = op -> op.name)
+    # Get unique mode names
+    mode_names = unique(vcat([op.name for op in creation_ops], [op.name for op in annihilation_ops]))
+    sort!(mode_names)
     
     # Build the operator vector [a₁, a₁†, a₂, a₂†, ...]
     operators = []
-    for (create_op, destroy_op) in zip(creation_ops, annihilation_ops)
-        push!(operators, destroy_op)  # annihilation operator
-        push!(operators, create_op)   # creation operator
+    for name in mode_names
+        # Find corresponding creation and annihilation operators
+        destroy_op = findfirst(op -> op.name == name, annihilation_ops)
+        create_op = findfirst(op -> op.name == name, creation_ops)
+        
+        if destroy_op !== nothing
+            push!(operators, annihilation_ops[destroy_op])  # annihilation operator
+        end
+        if create_op !== nothing
+            push!(operators, creation_ops[create_op])   # creation operator
+        end
     end
     
     return operators
 end
 
 """
-check_linearity(expr)
+check_linear(expr)
 
-Check if an expression contains only linear terms (up to second order in bosonic operators).
-Returns true if linear, false if nonlinear (third+ order products or fermionic operators).
+Check if an expression contains only linear terms (up to second order in quantum operators).
+Returns true if linear, false if nonlinear (third+ order products of quantum operators).
 """
-function check_linearity(expr)
-    # TODO: Implement check for third+ order products of bosonic operators
-    # TODO: Implement check for fermionic operators
-    # For now, assume all systems are linear
-    return true
+function check_linear(expr)
+    operator_count = count_quantum_operators(expr)
+    return operator_count < 3
+end
+
+"""
+count_quantum_operators(expr)
+
+Count the number of quantum operators in a multiplicative term.
+For additive expressions, this should be called on each term separately.
+"""
+function count_quantum_operators(expr)
+    if Symbolics.iscall(expr)
+        op = Symbolics.operation(expr)
+        args = Symbolics.arguments(expr)
+        
+        if op === (*)
+            # For multiplication, count quantum operators in arguments
+            # Filter out non-quantum operators (numbers, parameters)
+            count = 0
+            for arg in args
+                if arg isa Union{Create, Destroy, Transition}
+                    count += 1
+                end
+            end
+            return count
+        else
+            # For other operations, treat as single entity if it's a quantum operator
+            return expr isa Union{Create, Destroy, Transition} ? 1 : 0
+        end
+    else
+        # If not a tree (atom), check if it's a quantum operator
+        return expr isa Union{Create, Destroy, Transition} ? 1 : 0
+    end
 end
 
 """
@@ -237,17 +274,28 @@ The A matrix describes how the operators evolve: d/dt [operators] = A * [operato
 Throws an error if the system is nonlinear.
 """
 function build_drift_matrix(H, operators)
-    # Check if the system is linear
-    if !check_linearity(H)
-        throw(ArgumentError("This system is not linear and thus cannot be represented in state space form."))
-    end
-    
     n = length(operators)
     A = zeros(Symbolics.Num, n, n)
     
-    # TODO: For each operator, compute its time derivative from the Hamiltonian
-    # TODO: Use commutation relation: d/dt a = (i/ℏ)[H, a] with ℏ = 1
-    # TODO: Express result in terms of basis operators to fill A matrix
+    # For each operator, compute its time derivative from the Hamiltonian
+    # Use commutation relation: d/dt a = (i/ℏ)[H, a] with ℏ = 1
+    for (i, op) in enumerate(operators)
+        # Compute Heisenberg equation: d/dt op = i*[H, op]
+        heisenberg_eq = im * QuantumCumulants.commutator(H, op)
+        
+        # Extract additive terms from the Heisenberg equation
+        terms = get_additive_terms(heisenberg_eq)
+        
+        # Check if each term is linear
+        for term in terms
+            if !check_linear(term)
+                throw(ArgumentError("This system is not linear and thus cannot be represented in state space form."))
+            end
+        end
+        
+        # TODO: Express result in terms of basis operators to fill A matrix
+        # For now, this is a placeholder - would need to solve for coefficients
+    end
     
     return A
 end
@@ -284,7 +332,7 @@ Returns (A, B, C, D) matrices where:
 """
 function SLH2ABCD(sys::SLH)
     # Extract creation/annihilation operators
-    operators = extract_creation_annihilation_operators(sys)
+    operators = ordered_ops(sys)
     
     # Build matrices
     A = build_drift_matrix(sys.H, operators)

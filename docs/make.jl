@@ -6,7 +6,7 @@ push!(LOAD_PATH,"../src/")
 pages = ["Introduction" => "index.md",
          "General readout" => "cascadedoutputfilters.md",
          "Linear IFO" => ["ifoQT.md", "ifoQC.md"],
-         "Examples" => ["freqdepsqz.md", "jcfisher.md","oameyeQFI.md"],
+         "Examples" => ["freqdepsqz.md", "jcfisher.md","oameyeQFI.md", "slh_to_abcd.md"],
          "API" => "api.md"] 
 
 makedocs(sitename="SystemLevelHamiltonian", 

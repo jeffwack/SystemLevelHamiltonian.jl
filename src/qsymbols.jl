@@ -161,3 +161,40 @@ function get_additive_terms(expr)
         return [expr]
     end
 end
+
+"""
+    ordered_ops(expr)
+
+Extract all creation and annihilation operators from a quantum operator expression.
+Returns a vector of operators ordered as [a₁, a₁†, a₂, a₂†, ...] for each bosonic mode.
+Similar to get_qsymbols but returns a list instead of a set, with specific ordering.
+"""
+function ordered_ops(expr)
+    # Get all operators from the expression
+    all_ops = collect(get_qsymbols(expr))
+    
+    # Group operators by their base mode name
+    creation_ops = filter(op -> op isa Create, all_ops)
+    annihilation_ops = filter(op -> op isa Destroy, all_ops)
+    
+    # Get unique mode names
+    mode_names = unique(vcat([op.name for op in creation_ops], [op.name for op in annihilation_ops]))
+    sort!(mode_names)
+    
+    # Build the operator vector [a₁, a₁†, a₂, a₂†, ...]
+    operators = []
+    for name in mode_names
+        # Find corresponding creation and annihilation operators
+        destroy_op = findfirst(op -> op.name == name, annihilation_ops)
+        create_op = findfirst(op -> op.name == name, creation_ops)
+        
+        if destroy_op !== nothing
+            push!(operators, annihilation_ops[destroy_op])  # annihilation operator
+        end
+        if create_op !== nothing
+            push!(operators, creation_ops[create_op])   # creation operator
+        end
+    end
+    
+    return operators
+end
