@@ -12,7 +12,7 @@ using LinearAlgebra
 using QuantumToolbox
 
 include("qsymbols.jl")
-export get_qsymbols, promote, QOHamiltonian, check_hilberts, get_numsymbols, convert_to_QT, standard_initial_state
+export get_qsymbols, get_additive_terms, promote, QOHamiltonian, check_hilberts, get_numsymbols, convert_to_QT, standard_initial_state
 
 include("slh.jl")
 export SLH, concatenate, feedbackreduce, hilbert, operators, parameters

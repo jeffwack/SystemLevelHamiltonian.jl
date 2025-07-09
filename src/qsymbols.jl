@@ -125,3 +125,39 @@ function check_hilberts(expr)
     hilberts = [op.hilbert for op in operators]
     return all(y->y==hilberts[1],hilberts)
 end
+
+function get_additive_terms(expr)
+    """
+    Extract additive terms from a quantum operator expression.
+    
+    Takes an expression containing quantum operators and returns a list of terms
+    that contain no addition, only multiplication. Summing all returned terms
+    results in the original expression.
+    
+    Args:
+        expr: A symbolic expression containing quantum operators
+        
+    Returns:
+        Vector: List of terms without addition operators
+    """
+    if Symbolics.istree(expr)
+        op = Symbolics.operation(expr)
+        args = Symbolics.arguments(expr)
+        
+        if op === (+)
+            # If this is an addition, recursively get terms from each argument
+            terms = []
+            for arg in args
+                append!(terms, get_additive_terms(arg))
+            end
+            return terms
+        else
+            # If this is not an addition (multiplication, function call, etc.), 
+            # return the whole expression as a single term
+            return [expr]
+        end
+    else
+        # If not a tree (atom), return as single term
+        return [expr]
+    end
+end
