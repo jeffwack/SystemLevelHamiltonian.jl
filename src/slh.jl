@@ -196,7 +196,7 @@ function extract_creation_annihilation_operators(sys::SLH)
     # Get all operators from H and L
     H_ops = get_qsymbols(sys.H)
     L_ops = union([get_qsymbols(L_term) for L_term in sys.L]...)
-    all_ops = union(H_ops, L_ops)
+    all_ops = collect(union(H_ops, L_ops))
     
     # Group operators by their base mode (assuming they have a common structure)
     creation_ops = filter(op -> op isa Create, all_ops)
