@@ -1,18 +1,12 @@
 using Documenter
 using SystemLevelHamiltonian
 
-push!(LOAD_PATH,"../src/")
-
-pages = ["Introduction" => "index.md",
-         "General readout" => "cascadedoutputfilters.md",
-         "Linear IFO" => ["ifoQT.md", "ifoQC.md"],
-         "Examples" => ["freqdepsqz.md", "jcfisher.md","oameyeQFI.md"],
-         "API" => "api.md"] 
-
-makedocs(sitename="SystemLevelHamiltonian", 
-        pages = pages,
-        remotes = nothing)  
-
-deploydocs(
-    repo = "github.com/jeffwack/SystemLevelHamiltonian.jl.git"
+makedocs(
+    sitename = "SystemLevelHamiltonian.jl",
+    format = Documenter.HTML(),
+    modules = [SystemLevelHamiltonian],
+    pages = [
+        "Home" => "index.md",
+        "API Reference" => "api.md",
+    ],
 )

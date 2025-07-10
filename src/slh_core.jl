@@ -8,7 +8,9 @@ have the system name appended to them. The inputs and outputs describe 'ports' w
 Quantum systems must have the same number of inputs and outputs, which we denote by n.
 
 size(S) = (n, n) <- S is an nxn matrix
+
 size(L) = (n,)
+
 size(H) = ()
 
 The two ways of combining SLH systems are concatenate() and feedbackreduce()
@@ -21,21 +23,7 @@ struct SLH
     L #size n
     H #has operators which act on hilbert
 end
-#TODO: you should not be able to construct this if dimensions are wrong.
 
-"""
-hilbert(sys:SLH)
-
-returns the hilbert space of the Hamiltonian of the given system.
-"""
-function hilbert(sys::SLH)
-    ops = operators(sys) 
-    if check_hilberts(sum(ops)) #Have to sum because check_hilberts() is expecting an expression
-        return first(ops).hilbert
-    else
-        return error("non-unique hilbert space")
-    end
-end
 
 """
 operators(sys)
@@ -55,8 +43,7 @@ function parameters(sys::SLH)
     return union(get_numsymbols(sys.H),get_numsymbols(sys.L...))
 end
 
-
-#This function is for QuantumCumulants operators
+#This function is for SecondQuantizedAlgebra operators
 function promote(operator,product_space)
     #we identify the hilbert space which our operator acts on, which should be a subspace of the product space
     
@@ -83,7 +70,6 @@ function promote(operator,product_space)
     return typeof(operator).name.wrapper(product_space, middlefields...,subspaceindex)
 end
 
-
 """
 concatenate(name, syslist::Vector{SLH})
 
@@ -103,22 +89,11 @@ function concatenate(name,syslist)
     Slist = [sys.S for sys in syslist]
     S = cat(Slist...;dims=(1,2))
 
-    #= #this used to be here, and I have a feeling will be useful to look at when that call to cat throws an error eventually
-    #since the matrices may be of any type, we cannot use the built-in function cat(A[1], B[1]; dims=(1,2)) since it tries to create a matrix of zeros from type Any 
-    Z12 = zeros(size(A.S)[1],size(B.S)[1])
-    Z21 = zeros(size(B.S)[1],size(A.S)[1])
-
-    S1 = cat(A.S, Z12; dims=2)
-    S2 = cat(Z21, B.S; dims=2)
-
-    S = cat(S1,S2;dims=1)
-    =#
-    hilb_product = QuantumCumulants.tensor([hilbert(sys) for sys in syslist]...)
+    hilb_product = SecondQuantizedAlgebra.tensor([SecondQuantizedAlgebra.hilbert(sys.H) for sys in syslist]...)
 
     oldops = [collect(operators(sys)) for sys in syslist]
     newops = [[promote(op,hilb_product) for op in oplist] for oplist in oldops]
     
-
     rules = merge([Dict([old => new for (old,new) in zip(oldoplist,newoplist)]) for (oldoplist,newoplist) in zip(oldops,newops)]...)
     newHs = [substitute(sys.H,rules) for sys in syslist]
 
@@ -126,7 +101,7 @@ function concatenate(name,syslist)
 
     newLs = [[substitute(collapse,rules) for collapse in sys.L] for sys in syslist]
 
-    L = cat(newLs, dims=1)
+    L = vcat(newLs...)
 
     return SLH(name,inputs, outputs,S,L,H)
 end
@@ -157,7 +132,6 @@ function feedbackreduce(A,output, input)
     S = Sxbarybar + Sxbary*(1-Sxy)^(-1)*Sxybar
     #Have to use fill here because the usual broadcast syntax on operator does not work
     L = Lxbar +  Sxbary .* fill(((1-Sxy)^(-1)*Lx),size(Sxbary))
-    #println((dagger(Sy)*A.L)[1])
 
     term1 = adjoint(A.L)*Sy
     term2 = (1-Sxy)^(-1)
@@ -172,17 +146,3 @@ function feedbackreduce(A,output, input)
 
     return SLH(A.name,newinputs,newoutputs,S,L,H)
 end
-"""
-convert_to_QT(sys::SLH,paramrules,Ncuttof)
-
-return (standard_initial_state(QTH), SLH(sys.inputs, sys.outputs, S, QTL,QTH)) 
-"""
-function convert_to_QT(sys::SLH,Ncutoff,paramrules)
-    QTL = convert_to_QT([sys.L...,sys.H], Ncutoff,paramrules)
-    #QTS = TODO
-    QTH = pop!(QTL)
-    name = Symbol(sys.name,:_,:numeric)
-
-    return (SLH(name,sys.inputs, sys.outputs, sys.S, QTL,QTH),standard_initial_state(QTH))
-end
-
