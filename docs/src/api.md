@@ -1,30 +1,38 @@
-# SLH systems
+# API Reference
+
+### SLH type
+
 ```@docs
 SLH
 ```
 
+### SLH Operations
+
 ```@docs
 concatenate
-```
-
-```@docs
 feedbackreduce
-```
-
-```@docs
 operators
-```
-
-```@docs
 parameters
 ```
 
-# Quantum information
+## Symbolic Utilities
 
 ```@docs
-sld_operator
+get_qsymbols
+get_numsymbols
+get_additive_terms
 ```
 
+## Component Library
+
 ```@docs
-compute_qfi
+cavity
+squeezing_cavity
+radiation_pressure_cavity
+qed_cavity
+```
+
+## Function Index
+
+```@index
 ```

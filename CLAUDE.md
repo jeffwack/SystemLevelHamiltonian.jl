@@ -4,83 +4,126 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture Overview
 
-SystemLevelHamiltonian.jl is a Julia package for creating and combining open quantum systems using the SLH (System-Level Hamiltonian) framework. The package provides tools for quantum optics simulations and quantum information processing.
+SystemLevelHamiltonian.jl is a focused Julia package providing core SLH (System-Level Hamiltonian) framework functionality for creating and combining open quantum systems. After recent refactoring, the package now provides minimal, reusable components for quantum system modeling.
 
 ### Core Components
 
-- **SLH Framework**: The main abstraction for open quantum systems, defined in `src/slh.jl`. Each SLH system has inputs, outputs, scattering matrix (S), coupling vector (L), and Hamiltonian (H). 
+- **SLH Framework**: The main abstraction for open quantum systems, defined in `src/slh_core.jl`. Each SLH system has inputs, outputs, scattering matrix (S), coupling vector (L), and Hamiltonian (H).
 
-- **Quantum Symbols**: Defined in `src/qsymbols.jl`, provides utilities for working with quantum operators and symbolic expressions defined by QuantumCumulants.jl
+- **Quantum Symbol Utilities**: Defined in `src/qsymbols_core.jl`, provides utilities for extracting quantum operators and symbolic parameters from expressions.
 
-- **Component Library**: Pre-built quantum components in `src/componentlibrary.jl` including cavities, squeezing cavities, radiation pressure cavities, and QED cavities.
-
-- **Fisher Information**: Quantum Fisher Information calculations in `src/fisherinfo.jl` for parameter estimation and metrology applications.
-
-- **Linear Systems**: State-space representation and transfer functions in `src/linearsystems.jl` for control theory applications.
+- **Component Library**: Pre-built quantum components in `src/componentlibrary.jl` including basic cavities, squeezing cavities, radiation pressure cavities, and QED cavities.
 
 ### Key Dependencies
 
-- **QuantumCumulants**: For symbolic quantum calculations
-- **QuantumToolbox**: For simulating quantum system dynamics with a master
-  equation solver.
-- **ModelingToolkit**: For symbolic modeling
-- **Symbolics**: For symbolic mathematics
-- **OrdinaryDiffEq**: For differential equation solving
+- **SecondQuantizedAlgebra.jl**: For quantum operators, Hilbert spaces, and symbolic algebra
+- **Symbolics.jl**: For symbolic mathematics
+- **LinearAlgebra.jl**: For matrix operations
 
 ### System Operations
 
 Two primary ways to combine SLH systems:
-1. `concatenate()`: Series connection of systems
-2. `feedbackreduce()`: Feedback connections between systems
+1. `concatenate(name, systems_list)`: Parallel composition of systems
+2. `feedbackreduce(system, output, input)`: Feedback connections between ports
 
-### Examples Structure
+### Package Structure
 
-The `examples/` directory contains demonstrations organized by physics:
-- `Atom_IFO/`: Atom-interferometer systems
-- `Jaynes_Cummings/`: Jaynes-Cummings model implementations
-- `empty_cavity/`: Cavity quantum electrodynamics
-- `lambda_in_cavity/`: Photon storage systems
-- `linear_optomechanical/`: Optomechanical systems
-- `single_spin/`: Single spin systems
+```
+SystemLevelHamiltonian/
+├── src/
+│   ├── SystemLevelHamiltonian.jl  # Main module file
+│   ├── slh_core.jl               # SLH struct and operations
+│   ├── qsymbols_core.jl          # Quantum symbol utilities
+│   └── componentlibrary.jl       # Pre-built components
+├── test/
+│   └── runtests.jl               # Test suite
+├── docs/
+│   ├── make.jl                   # Documentation builder
+│   ├── Project.toml              # Doc dependencies
+│   └── src/
+│       ├── index.md              # Main documentation
+│       └── api.md                # API reference
+└── CLAUDE.md                     # This file
+```
 
 ### Documentation
 
 Documentation is built using Documenter.jl and includes:
-- API documentation
-- Examples for IFO models (both QuantumCumulants and QuantumToolbox implementations)
-- Frequency-dependent squeezing examples
-- Quantum Fisher Information examples
-- SLH to ABCD conversion examples
-
-#### Documentation Structure
-```
-docs/
-├── make.jl              # Documenter.jl configuration
-├── Project.toml         # Documentation dependencies
-├── Manifest.toml        # Locked dependencies
-├── build/               # Generated documentation (gitignored)
-└── src/                 # Source markdown files
-    ├── index.md         # Main documentation page
-    ├── api.md           # API documentation
-    ├── cascadedoutputfilters.md
-    ├── freqdepsqz.md
-    ├── ifoQC.md
-    ├── ifoQT.md
-    ├── jcfisher.md
-    ├── oameyeQFI.md
-    └── slh_to_abcd.md   # SLH to ABCD conversion examples
-```
-
-#### Adding Documentation Pages
-When adding new documentation pages:
-1. Create the markdown file in `docs/src/`
-2. Use `@example` blocks for executable Julia code
-3. Update `docs/make.jl` to include the new page in the `pages` array
-4. The `pages` array controls both the navigation structure and build order
+- Package overview and quick start guide
+- Complete API reference with docstrings
+- Examples of system composition and feedback
 
 ### Testing
 
-Minimal test suite in `test/runtests.jl`. The package is in development with version 1.0.0-DEV.
+Test suite in `test/runtests.jl` covers:
+- Quantum symbol utilities (`get_qsymbols`, `get_numsymbols`, `get_additive_terms`)
+- SLH struct operations (`operators`, `parameters`)
+- System composition (`concatenate`)
+- Component library functions
+
+## Development Guidelines
+
+When adding or modifying package functionality, ensure consistency across these areas:
+
+### 1. Function Implementation
+- Add the function to the appropriate file (`slh_core.jl`, `qsymbols_core.jl`, or `componentlibrary.jl`)
+- Follow Julia naming conventions (lowercase, underscores for multi-word)
+- Include proper type annotations where helpful
+
+### 2. Docstrings
+- Add comprehensive docstrings following the template below
+- Include function signature, description, arguments, and returns
+- Keep examples simple and focused (avoid complex doctests)
+
+```julia
+"""
+    function_name(arg1, arg2)
+
+Brief description of what the function does.
+
+More detailed explanation if needed.
+
+# Arguments
+- `arg1`: Description of first argument
+- `arg2`: Description of second argument
+
+# Returns
+- Description of return value and type
+"""
+```
+
+### 3. Exports
+- Add new public functions to the appropriate export list in `src/SystemLevelHamiltonian.jl`
+- Group exports logically (SLH operations, utilities, components)
+
+### 4. Tests
+- Add tests for new functionality in `test/runtests.jl`
+- Use `@testset` to group related tests
+- Test both expected behavior and edge cases
+- Ensure tests are self-contained and don't rely on external state
+
+### 5. Documentation
+- Update API reference in `docs/src/api.md` to include new functions in appropriate `@docs` blocks
+- Add examples to `docs/src/index.md` if the functionality warrants it
+- Consider whether new functionality needs its own documentation page
+
+### 6. Consistency Checklist
+
+When adding/changing functionality, verify:
+- [ ] Function is implemented with proper docstring
+- [ ] Function is exported in `SystemLevelHamiltonian.jl`
+- [ ] Function is included in `@docs` block in `docs/src/api.md`
+- [ ] Tests are added to `test/runtests.jl`
+- [ ] Documentation builds without errors (`julia --project=docs docs/make.jl`)
+- [ ] All tests pass (`julia --project=. -e "using Pkg; Pkg.test()"`)
+
+### Notes on Removed Functionality
+
+The package was recently refactored to focus on core SLH functionality:
+- Removed redundant `hilbert()` function (use `SecondQuantizedAlgebra.hilbert()` directly)
+- Removed `check_hilberts()` function (SecondQuantizedAlgebra handles this automatically)
+- Examples and complex applications moved to separate Breadboard package
+- Fixed `concatenate()` function to properly flatten coupling vectors
 
 ## Julia Best Practices
 
