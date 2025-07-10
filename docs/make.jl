@@ -10,3 +10,7 @@ makedocs(
         "API Reference" => "api.md",
     ],
 )
+
+deploydocs(
+    repo = "github.com/jeffwack/SystemLevelHamiltonian.jl.git"
+)
