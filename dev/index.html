@@ -3,24 +3,19 @@
 using SecondQuantizedAlgebra
 
 # Create a Hilbert space and operators
-hilbA = FockSpace(:cavityA)
-hilbB = FockSpace(:cavityB)
+hilb = FockSpace(:cavity)
 
-@qnumbers a::Destroy(hilbA) b::Destroy(hilbB)
-@cnumbers ω1 ω2 κ1 κ2
+@qnumbers a::Destroy(hilb)
+@cnumbers ω κ
 
 # Define system components
-H1 = ω1 * a&#39; * a
-L1 = [sqrt(κ1) * a]
-S1 = [1]
-
-H2 = ω2 * b&#39; * b
-L2 = [sqrt(κ2) * b]
-S2 = [1]
+H = ω * a&#39; * a
+L = [sqrt(κ) * a]
+S = [1]
 
 # Create SLH systems
-cavityA = SLH(:A, [:in], [:out], S1, L1, H1)
-cavityB = SLH(:B, [:in], [:out], S2, L2, H2)
+cavityA = SLH(:A, [:in], [:out], S, L, H)
+cavityB = SLH(:B, [:in], [:out], S, L, H)
 
 sys = concatenate(:chain, [cavityA, cavityB])
 sys = feedbackreduce(sys, :out_A, :in_B)
@@ -29,6 +24,7 @@ println(sys.H)
 
 # Extract information
 println(operators(sys))        # Get quantum operators
-println(parameters(sys))    # Get symbolic parameters</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(ω1*(a′*a)+ω2*(b′*b)+(0.0 - 0.5im)*sqrt(κ1)*conj(sqrt(κ2))*(a*b′)+(-0.0 + 0.5im)*sqrt(κ2)*conj(sqrt(κ1))*(a′*b))
-Set(Any[a′, b′, b, a])
-Set(Any[κ2, ω1, ω2, κ1])</code></pre><h2 id="Overview-of-SLH-systems"><a class="docs-heading-anchor" href="#Overview-of-SLH-systems">Overview of SLH systems</a><a id="Overview-of-SLH-systems-1"></a><a class="docs-heading-anchor-permalink" href="#Overview-of-SLH-systems" title="Permalink"></a></h2><p>The SLH framework represents each open quantum systems with three components:</p><ul><li><strong>S</strong>: Scattering matrix describing direct input-output coupling of external (bath) modes</li><li><strong>L</strong>: Coupling vector describing the interaction of the internal modes with the external modes </li><li><strong>H</strong>: System Hamiltonian describing internal dynamics</li></ul><h3 id="Component-Library"><a class="docs-heading-anchor" href="#Component-Library">Component Library</a><a id="Component-Library-1"></a><a class="docs-heading-anchor-permalink" href="#Component-Library" title="Permalink"></a></h3><p>The SLH framework enables you to create complicated quantum systems by combining simple, reusable components</p><ul><li>Pre-built quantum components including:<ul><li>Basic cavities</li><li>Squeezing cavities  </li><li>Radiation pressure cavities</li><li>Jaynes-Cummings QED cavity</li></ul></li></ul><h2 id="Dependencies"><a class="docs-heading-anchor" href="#Dependencies">Dependencies</a><a id="Dependencies-1"></a><a class="docs-heading-anchor-permalink" href="#Dependencies" title="Permalink"></a></h2><ul><li><a href="https://github.com/qojulia/SecondQuantizedAlgebra.jl">SecondQuantizedAlgebra.jl</a> provides the symbolic algebra system for quantum operators</li></ul><h2 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h2><ul><li><a href="https://arxiv.org/pdf/1611.00375">The SLH framework for modeling quantum input-output networks</a></li></ul></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 14 July 2025 15:27">Monday 14 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+println(parameters(sys))    # Get symbolic parameters</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Vector{SecondQuantizedAlgebra.QSym}[[A_a, A_a′], [B_a, B_a′]]
+(ω*(A_a′*A_a)+ω*(B_a′*B_a)+(0.0 - 0.5im)*sqrt(κ)*conj(sqrt(κ))*(B_a′*A_a)+(-0.0 + 0.5im)*sqrt(κ)*conj(sqrt(κ))*(A_a′*B_a))
+Set(Any[A_a′, A_a, B_a′, B_a])
+Set(Any[κ, ω])</code></pre><h2 id="Overview-of-SLH-systems"><a class="docs-heading-anchor" href="#Overview-of-SLH-systems">Overview of SLH systems</a><a id="Overview-of-SLH-systems-1"></a><a class="docs-heading-anchor-permalink" href="#Overview-of-SLH-systems" title="Permalink"></a></h2><p>The SLH framework represents each open quantum systems with three components:</p><ul><li><strong>S</strong>: Scattering matrix describing direct input-output coupling of external (bath) modes</li><li><strong>L</strong>: Coupling vector describing the interaction of the internal modes with the external modes </li><li><strong>H</strong>: System Hamiltonian describing internal dynamics</li></ul><h3 id="Component-Library"><a class="docs-heading-anchor" href="#Component-Library">Component Library</a><a id="Component-Library-1"></a><a class="docs-heading-anchor-permalink" href="#Component-Library" title="Permalink"></a></h3><p>The SLH framework enables you to create complicated quantum systems by combining simple, reusable components</p><ul><li>Pre-built quantum components including:<ul><li>Basic cavities</li><li>Squeezing cavities  </li><li>Radiation pressure cavities</li><li>Jaynes-Cummings QED cavity</li></ul></li></ul><h2 id="Dependencies"><a class="docs-heading-anchor" href="#Dependencies">Dependencies</a><a id="Dependencies-1"></a><a class="docs-heading-anchor-permalink" href="#Dependencies" title="Permalink"></a></h2><ul><li><a href="https://github.com/qojulia/SecondQuantizedAlgebra.jl">SecondQuantizedAlgebra.jl</a> provides the symbolic algebra system for quantum operators</li></ul><h2 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h2><ul><li><a href="https://arxiv.org/pdf/1611.00375">The SLH framework for modeling quantum input-output networks</a></li></ul></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Wednesday 16 July 2025 23:31">Wednesday 16 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
