@@ -19,9 +19,9 @@ and one output port with direct transmission (S=1).
 function cavity(name)
     #Define the filter cavity 
     hilb = FockSpace(name)
-    a = Destroy(hilb,Symbol(:a,:_,name))
+    a = Destroy(hilb,:a)
 
-    (κ, Δ) = cnumbers(Symbol(:κ,:_,name),Symbol(:Δ,:_,name))
+    (κ, Δ) = cnumbers(:κ,:Δ)
 
     return SLH(name,
                 [:In],
@@ -52,16 +52,16 @@ and an external driving field.
 - `h`: External driving amplitude
 """
 function qed_cavity(name)
-    hcav = FockSpace(Symbol(:cav,:_,name))
-    hspin = NLevelSpace(Symbol(:cav,:_,name),2)
+    hcav = FockSpace(:cav)
+    hspin = NLevelSpace(:cav,2)
     hilb = SecondQuantizedAlgebra.tensor(hcav,hspin)
 
     # Define the operators
-    a = Destroy(hilb,Symbol(:a,:_,name))
+    a = Destroy(hilb,:a)
 
-    σ(i,j) = Transition(hilb, Symbol(:σ,:_,name), i, j, 2)
+    σ(i,j) = Transition(hilb, :σ, i, j, 2)
 
-    (Δ, g, κ, h,) = cnumbers(Symbol(:Δ,:_,name),Symbol(:g,:_,name),Symbol(:κ,:_,name),Symbol(:h,:_,name))
+    (Δ, g, κ, h) = cnumbers(:Δ,:g,:κ,:h)
 
     # Hamiltonian
     H = Δ*a'*a + g*(a'*σ(1,2) + a*σ(2,1)) + h*(a + a')
@@ -96,9 +96,9 @@ interaction (two-mode squeezing Hamiltonian).
 """
 function squeezing_cavity(name)
     hilb = FockSpace(:squeezer)
-    a = Destroy(hilb, Symbol(:a,:_,name))
+    a = Destroy(hilb, :a)
 
-    (κ,ϵ) = cnumbers(Symbol(:κ,:_,name),Symbol(:ϵ,:_,name))
+    (κ,ϵ) = cnumbers(:κ,:ϵ)
 
     return SLH(name,
                 [:In],
@@ -129,11 +129,11 @@ mechanical oscillator through radiation pressure.
 - `g`: Optomechanical coupling strength
 """
 function radiation_pressure_cavity(name)
-    hilb = SecondQuantizedAlgebra.tensor(FockSpace(Symbol(name,:_,:optical)), FockSpace(Symbol(name,:_,:mechanical)))
-    a = Destroy(hilb,Symbol(:a,:_,name),1) 
-    b = Destroy(hilb,Symbol(:b,:_,name),2) 
+    hilb = SecondQuantizedAlgebra.tensor(FockSpace(:optical), FockSpace(:mechanical))
+    a = Destroy(hilb,:a,1) 
+    b = Destroy(hilb,:b,2) 
 
-    (κ, Δ, Ω, g) = cnumbers(Symbol(:κ,:_,name),Symbol(:Δ,:_,name),Symbol(:Ω,:_,name),Symbol(:g,:_,name))
+    (κ, Δ, Ω, g) = cnumbers(:κ,:Δ,:Ω,:g)
 
     return SLH(name,
                 [:In],

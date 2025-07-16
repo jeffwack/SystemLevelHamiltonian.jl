@@ -10,24 +10,19 @@ using SystemLevelHamiltonian
 using SecondQuantizedAlgebra
 
 # Create a Hilbert space and operators
-hilbA = FockSpace(:cavityA)
-hilbB = FockSpace(:cavityB)
+hilb = FockSpace(:cavity)
 
-@qnumbers a::Destroy(hilbA) b::Destroy(hilbB)
-@cnumbers ω1 ω2 κ1 κ2
+@qnumbers a::Destroy(hilb)
+@cnumbers ω κ
 
-# Define system components
-H1 = ω1 * a' * a
-L1 = [sqrt(κ1) * a]            
-S1 = [1]                    
-
-H2 = ω2 * b' * b
-L2 = [sqrt(κ2) * b]
-S2 = [1]
+# Define system components 
+H = ω * a' * a
+L = [sqrt(κ) * a]
+S = [1]
 
 # Create SLH systems
-cavityA = SLH(:A, [:in], [:out], S1, L1, H1)
-cavityB = SLH(:B, [:in], [:out], S2, L2, H2)
+cavityA = SLH(:A, [:in], [:out], S, L, H)
+cavityB = SLH(:B, [:in], [:out], S, L, H)
 
 sys = concatenate(:chain, [cavityA, cavityB])
 sys = feedbackreduce(sys, :out_A, :in_B)

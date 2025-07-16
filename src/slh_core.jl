@@ -40,11 +40,11 @@ parameters(sys)
 returns all the symbolic numbers contained in the system's Hamiltonian and coupling vector L.
 """
 function parameters(sys::SLH)
-    return union(get_numsymbols(sys.H),get_numsymbols(sys.L...))
+    return union(get_numsymbols(sys.H),get_numsymbols(sum(sys.L)))
 end
 
 #This function is for SecondQuantizedAlgebra operators
-function promote(operator,product_space)
+function promote(operator,product_space,topname)
     #we identify the hilbert space which our operator acts on, which should be a subspace of the product space
     
     if hasproperty(operator.hilbert,:spaces) #then it is a product space
@@ -66,8 +66,11 @@ function promote(operator,product_space)
     middlefieldnames = fieldnames(typeof(operator))[2:end-2]
     middlefields = [getfield(operator,name) for name in middlefieldnames]
 
+    old_op_name = pop!(middlefields)
+    new_op_name = Symbol(topname,:_,old_op_name)
+
     #this calls the operator constructor with the old 'middle data' but on the larger hilbert space
-    return typeof(operator).name.wrapper(product_space, middlefields...,subspaceindex)
+    return typeof(operator).name.wrapper(product_space,new_op_name, middlefields...,subspaceindex)
 end
 
 """
@@ -91,15 +94,18 @@ function concatenate(name,syslist)
 
     hilb_product = SecondQuantizedAlgebra.tensor([SecondQuantizedAlgebra.hilbert(sys.H) for sys in syslist]...)
 
-    oldops = [collect(operators(sys)) for sys in syslist]
-    newops = [[promote(op,hilb_product) for op in oplist] for oplist in oldops]
+    oldopsplusname = [(collect(operators(sys)),sys.name) for sys in syslist]
+    #println(oldopsplusname)
+    newops = [[promote(op,hilb_product,name) for op in oplist] for (oplist,name) in oldopsplusname]
+    println(newops)
+    oldops = [tup[1] for tup in oldopsplusname]
     
-    rules = merge([Dict([old => new for (old,new) in zip(oldoplist,newoplist)]) for (oldoplist,newoplist) in zip(oldops,newops)]...)
-    newHs = [substitute(sys.H,rules) for sys in syslist]
+    rulelist = [Dict([old => new for (old,new) in zip(oldoplist,newoplist)]) for (oldoplist,newoplist) in zip(oldops,newops)]
+    newHs = [substitute(sys.H,rules) for (rules,sys) in zip(rulelist,syslist)]
 
     H = sum(newHs)
 
-    newLs = [[substitute(collapse,rules) for collapse in sys.L] for sys in syslist]
+    newLs = [[substitute(collapse,rules) for collapse in sys.L] for (rules,sys) in zip(rulelist,syslist)]
 
     L = vcat(newLs...)
 
