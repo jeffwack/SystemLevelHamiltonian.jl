@@ -43,6 +43,12 @@ function parameters(sys::SLH)
     return union(get_numsymbols(sys.H),get_numsymbols(sum(sys.L)))
 end
 
+function promote(parameter, topname)
+    old_sym = parameter.metadata[Symbolics.VariableSource][2]
+    new_sym = Symbol(topname,:_,old_sym)
+    return cnumber(new_sym)
+end
+
 #This function is for SecondQuantizedAlgebra operators
 function promote(operator,product_space,topname)
     #we identify the hilbert space which our operator acts on, which should be a subspace of the product space
@@ -93,14 +99,25 @@ function concatenate(name,syslist)
     S = cat(Slist...;dims=(1,2))
 
     hilb_product = SecondQuantizedAlgebra.tensor([SecondQuantizedAlgebra.hilbert(sys.H) for sys in syslist]...)
-
+    
+    #find and promote old operators to new larger Hilbert space
     oldopsplusname = [(collect(operators(sys)),sys.name) for sys in syslist]
     #println(oldopsplusname)
     newops = [[promote(op,hilb_product,name) for op in oplist] for (oplist,name) in oldopsplusname]
-    println(newops)
-    oldops = [tup[1] for tup in oldopsplusname]
     
-    rulelist = [Dict([old => new for (old,new) in zip(oldoplist,newoplist)]) for (oldoplist,newoplist) in zip(oldops,newops)]
+    oldops = [tup[1] for tup in oldopsplusname]
+
+    #promote names of parameters
+    oldparamsplusname = [(collect(parameters(sys)),sys.name) for sys in syslist]
+    
+    newparams = [[promote(param,name) for param in paramlist] for (paramlist,name) in oldparamsplusname]
+    
+    oldparams = [tup[1] for tup in oldparamsplusname]
+
+    oldsyms = [cat(ops,params,dims=1) for (ops,params) in zip(oldops,oldparams)]
+    newsyms = [cat(ops,params,dims=1) for (ops,params) in zip(newops,newparams)] 
+    
+    rulelist = [Dict([old => new for (old,new) in zip(oldoplist,newoplist)]) for (oldoplist,newoplist) in zip(oldsyms,newsyms)]
     newHs = [substitute(sys.H,rules) for (rules,sys) in zip(rulelist,syslist)]
 
     H = sum(newHs)
