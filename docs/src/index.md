@@ -1,12 +1,12 @@
-# SystemLevelHamiltonian.jl
+# SLHQuantumSystems.jl
 
-SystemLevelHamiltonian.jl is a Julia package for creating and composing open
+SLHQuantumSystems.jl is a Julia package for creating and composing open
 quantum systems using the SLH framework. 
 
 ## Quick Start
 
 ```@example quick
-using SystemLevelHamiltonian
+using SLHQuantumSystems
 using SecondQuantizedAlgebra
 
 # Create a Hilbert space and operators
@@ -25,7 +25,7 @@ cavityA = SLH(:A, [:in], [:out], S, L, H)
 cavityB = SLH(:B, [:in], [:out], S, L, H)
 
 sys = concatenate([cavityA, cavityB],:chain)
-sys = feedbackreduce(sys, :out_A, :in_B)
+sys = feedbackreduce(sys, :A_out, :B_in)
 
 println(sys.H)
 

@@ -1,9 +1,9 @@
-using SystemLevelHamiltonian
+using SLHQuantumSystems
 using Test
 using SecondQuantizedAlgebra
 using Symbolics
 
-@testset "SystemLevelHamiltonian.jl" begin
+@testset "SLHQuantumSystems.jl" begin
     
     @testset "get_additive_terms" begin
         # Create test Hilbert space and operators

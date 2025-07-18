@@ -1,14 +1,14 @@
-using SystemLevelHamiltonian
+using SLHQuantumSystems
 using Documenter
 
-DocMeta.setdocmeta!(SystemLevelHamiltonian, :DocTestSetup, :(using SystemLevelHamiltonian); recursive=true)
+DocMeta.setdocmeta!(SLHQuantumSystems, :DocTestSetup, :(using SLHQuantumSystems); recursive=true)
 
 makedocs(;
-    modules=[SystemLevelHamiltonian],
+    modules=[SLHQuantumSystems],
     authors="Jeffrey Wack <jeffwack111@gmail.com> and contributors",
-    sitename="SystemLevelHamiltonian.jl",
+    sitename="SLHQuantumSystems.jl",
     format=Documenter.HTML(;
-        canonical="https://jeffwack.github.io/SystemLevelHamiltonian.jl",
+        canonical="https://jeffwack.github.io/SLHQuantumSystems.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -19,6 +19,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/jeffwack/SystemLevelHamiltonian.jl",
+    repo="github.com/jeffwack/SLHQuantumSystems.jl",
     devbranch="main",
 )

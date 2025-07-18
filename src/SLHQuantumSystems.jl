@@ -1,4 +1,4 @@
-module SystemLevelHamiltonian
+module SLHQuantumSystems
 
 using SecondQuantizedAlgebra
 using Symbolics
