@@ -24,7 +24,7 @@ S = [1]
 cavityA = SLH(:A, [:in], [:out], S, L, H)
 cavityB = SLH(:B, [:in], [:out], S, L, H)
 
-sys = concatenate(:chain, [cavityA, cavityB])
+sys = concatenate([cavityA, cavityB],:chain)
 sys = feedbackreduce(sys, :out_A, :in_B)
 
 println(sys.H)

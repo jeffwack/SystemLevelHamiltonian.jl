@@ -15,13 +15,13 @@ size(H) = ()
 
 The two ways of combining SLH systems are concatenate() and feedbackreduce()
 """
-struct SLH
-    name #should be a symbol
-    inputs #must have unique elements
-    outputs #must have unique elements
-    S #size nxn
-    L #size n
-    H #has operators which act on hilbert
+struct SLH{S,L,H}
+    name::Symbol #should be a symbol
+    inputs::Vector{Symbol} #must have unique elements
+    outputs::Vector{Symbol} #must have unique elements
+    S::S #size nxn
+    L::L #size n
+    H::H #has operators which act on hilbert
 end
 
 
@@ -43,14 +43,37 @@ function parameters(sys::SLH)
     return union(get_numsymbols(sys.H),get_numsymbols(sum(sys.L)))
 end
 
-function promote(parameter, topname)
+
+function promote(parameter::SymbolicUtils.BasicSymbolic, topname)
     old_sym = parameter.metadata[Symbolics.VariableSource][2]
     new_sym = Symbol(topname,:_,old_sym)
     return cnumber(new_sym)
 end
 
+function promote_name(hilb::SecondQuantizedAlgebra.ConcreteHilbertSpace, name)
+    names = fieldnames(typeof(hilb))
+    fields = [getfield(hilb,name) for name in names] 
+    
+    oldname = pop!(fields)
+
+    newname = Symbol(name,:_,oldname)
+    pushfirst!(fields,newname)
+
+    return typeof(hilb).name.wrapper(fields...)
+end
+
+
+function promote_name(hilb::SecondQuantizedAlgebra.ProductSpace, name)
+    #We want to create a new hilbert space where the names of all the subspaces 
+    #has name prepended to it. 
+    
+    new_spaces = promote.(hilb.spaces, [name])
+
+    return tensor(new_spaces...)
+end
+
 #This function is for SecondQuantizedAlgebra operators
-function promote(operator,product_space,topname)
+function promote_op(operator,old_product_space,new_product_space, topname)
     #we identify the hilbert space which our operator acts on, which should be a subspace of the product space
     
     if hasproperty(operator.hilbert,:spaces) #then it is a product space
@@ -60,7 +83,7 @@ function promote(operator,product_space,topname)
     end
 
     #this identifies the operator's hilbert space as a subspace of the product space
-    subspaceindex = findfirst(isequal(subspace),product_space.spaces)
+    subspaceindex = findfirst(isequal(subspace),old_product_space.spaces)
 
     if isnothing(subspaceindex)
         error("$operator does not act on a subspace of $product_space")
@@ -76,34 +99,44 @@ function promote(operator,product_space,topname)
     new_op_name = Symbol(topname,:_,old_op_name)
 
     #this calls the operator constructor with the old 'middle data' but on the larger hilbert space
-    return typeof(operator).name.wrapper(product_space,new_op_name, middlefields...,subspaceindex)
+    return typeof(operator).name.wrapper(new_product_space,new_op_name, middlefields...,subspaceindex)
 end
 
 """
 concatenate(name, syslist::Vector{SLH})
 
 creates a composite system with no interconnections. Combes eq. 59
-"""
-function concatenate(name,syslist)
-    #To create a combined system, we 'stack' the inputs and outputs of A on top of those of B
 
+When systems are concatenated, the names of their inputs, outputs, operators,
+parameters, and Hilbert spaces are 'promoted' by prepending the name of the 
+system to the existing name. This prevents name collisions as long as all 
+SLHSystems are created with a unique name.
+"""
+function concatenate(syslist,name)
+    old_hilberts = [SecondQuantizedAlgebra.hilbert(sys.H) for sys in syslist]
+    sys_names = [sys.name for sys in syslist]
+    hilb_product = tensor(promote_name.(old_hilberts,sys_names)...)
+    old_hilb_product = tensor(old_hilberts...) # we will pass this to promote to aid in
+
+    #hilb_product = SecondQuantizedAlgebra.tensor([SecondQuantizedAlgebra.hilbert(sys.H) for sys in syslist]...)
+    
+    #We 'stack' the inputs and outputs of the systems we are combining.
     #first, we promote the names of inputs and outputs, to prevent naming collisions
-    newinputs = [[Symbol(input,:_,sys.name) for input in sys.inputs] for sys in syslist]
+    newinputs = [[Symbol(sys.name,:_,input) for input in sys.inputs] for sys in syslist]
     inputs = cat(newinputs...,dims = 1)
 
-    newoutputs = [[Symbol(output,:_,sys.name) for output in sys.outputs] for sys in syslist]
+    newoutputs = [[Symbol(sys.name,:_,output) for output in sys.outputs] for sys in syslist]
     outputs = cat(newoutputs...,dims = 1)
 
     #next, we concate all the scattering matrices block diagonally
     Slist = [sys.S for sys in syslist]
     S = cat(Slist...;dims=(1,2))
 
-    hilb_product = SecondQuantizedAlgebra.tensor([SecondQuantizedAlgebra.hilbert(sys.H) for sys in syslist]...)
     
     #find and promote old operators to new larger Hilbert space
     oldopsplusname = [(collect(operators(sys)),sys.name) for sys in syslist]
     #println(oldopsplusname)
-    newops = [[promote(op,hilb_product,name) for op in oplist] for (oplist,name) in oldopsplusname]
+    newops = [[promote_op(op,old_hilb_product,hilb_product,name) for op in oplist] for (oplist,name) in oldopsplusname]
     
     oldops = [tup[1] for tup in oldopsplusname]
 
