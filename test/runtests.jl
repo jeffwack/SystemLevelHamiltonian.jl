@@ -165,28 +165,24 @@ using Symbolics
     
     @testset "cascade" begin
         # Create two test systems (following the docs quick start pattern)
-        hfA = FockSpace(:cavityA)
-        hfB = FockSpace(:cavityB)
-        @qnumbers a::Destroy(hfA) b::Destroy(hfB)
-        @cnumbers ω1 ω2 κ1 κ2
+        hilb = FockSpace(:cavity)
+        @qnumbers a::Destroy(a)
+        @cnumbers ω κ
         
         # Define system components
-        H1 = ω1 * a' * a
-        L1 = [√κ1 * a]
-        S1 = [1]
-        cavityA = SLH(:A, [:in], [:out], S1, L1, H1)
-        
-        H2 = ω2 * b' * b
-        L2 = [√κ2 * b]
-        S2 = [1]
-        cavityB = SLH(:B, [:in], [:out], S2, L2, H2)
+        H = ω * a' * a
+        L = [√κ * a]
+        S = [1]
+
+        cavityA = SLH(:A, [:in], [:out], S, L, H)
+        cavityB = SLH(:B, [:in], [:out], S, L, H)
         
         # Test that concatenate runs without error
-        combined = concatenate(:chain, [cavityA, cavityB])
+        combined = concatenate([cavityA, cavityB],:chain)
         @test isa(combined, SLH)
         
         # Test that feedbackreduce runs without error
-        cascaded = feedbackreduce(combined, :out_A, :in_B)
+        cascaded = feedbackreduce(combined, :A_out, :B_in)
         @test isa(cascaded, SLH)
     end
 
