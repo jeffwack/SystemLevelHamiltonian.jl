@@ -166,7 +166,7 @@ using Symbolics
     @testset "cascade" begin
         # Create two test systems (following the docs quick start pattern)
         hilb = FockSpace(:cavity)
-        @qnumbers a::Destroy(a)
+        @qnumbers a::Destroy(hilb,:a)
         @cnumbers ω κ
         
         # Define system components
