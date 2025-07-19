@@ -78,6 +78,6 @@ jobs:
         shell: julia --project=docs --color=yes {0}
         run: |
           using Documenter: DocMeta, doctest
-          using SystemLevelHamiltonian
-          DocMeta.setdocmeta!(SystemLevelHamiltonian, :DocTestSetup, :(using SystemLevelHamiltonian); recursive=true)
-          doctest(SystemLevelHamiltonian)
+          using SLHQuantumSystems
+          DocMeta.setdocmeta!(SLHQuantumSystems, :DocTestSetup, :(using SLHQuantumSystems); recursive=true)
+          doctest(SLHQuantumSystems)
